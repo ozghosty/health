@@ -278,9 +278,6 @@ def gh_sleep(token, start, end, tz):
     filt = f'sleep.interval.end_time >= "{utc(start)}" AND sleep.interval.end_time < "{utc(end)}"'
     nights, intervals = {}, {}
     points = gh_list(token, "sleep", filt, 25)
-    # Field names only (no values), to spot a sleep score if Google ever adds one
-    log("  sleep fields: " + ", ".join(sorted({k for s in points for k in s}))
-        + " | summary: " + ", ".join(sorted({k for s in points for k in s.get("summary", {})})))
     for s in points:
         meta = s.get("metadata", {})
         if meta.get("nap") or meta.get("mainSleep") is False:
@@ -298,20 +295,9 @@ def gh_sleep(token, start, end, tz):
             "sleepHrs": round(asleep / 60, 1),
             "deepMin": stages.get("DEEP"), "remMin": stages.get("REM"),
             "lightMin": stages.get("LIGHT"), "awakeMin": int(sm.get("minutesAwake", 0)),
-            "sleepScore": estimate_sleep_score(asleep, stages, int(sm.get("minutesAwake", 0))),
         }
         intervals[date] = (begin, finish)
     return nights, intervals
-
-
-def estimate_sleep_score(asleep, stages, awake):
-    """Google Health doesn't expose the Fitbit app's sleep score, so approximate it with
-    the same three parts: duration (50), deep+REM share (25) and restfulness (25)."""
-    duration = min(asleep / 480, 1) * 50
-    deep_rem = (stages.get("DEEP", 0) + stages.get("REM", 0)) / asleep if asleep else 0
-    quality = min(deep_rem / 0.4, 1) * 25
-    restful = max(0, 1 - awake / max(asleep + awake, 1) / 0.25) * 25
-    return round(duration + quality + restful)
 
 
 def gh_heart_rate(token, start, end, tz, sleep_intervals, smoothing, low_from):

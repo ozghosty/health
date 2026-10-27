@@ -44,7 +44,6 @@
   const day = (s, o) => new Date(s + "T00:00:00").toLocaleDateString("en-AU", o);
 
   const bp = H.blood_pressure || {};
-  const estScore = (H.sleep || {}).score_source === "estimate";
   document.title = H.dashboard?.title || "Health Dashboard";
   document.getElementById("kicker").innerHTML = ["Health dashboard", ...H.sources.map((s) => s === "fitbit" ? "Fitbit" : "Withings")]
     .map(esc).join("<span>·</span>");
@@ -54,7 +53,7 @@
     ["Height", P.height_cm && P.height_cm + " cm"], ["Goal weight", G.weight_kg && G.weight_kg + " kg"],
     ["Conditions", (P.conditions || []).join(", ")], ["Medications", (P.medications || []).join("; ")],
   ].filter(([, v]) => v).map(([k, v]) => `<span>${k} <b>${esc(v)}</b></span>`).join("");
-  document.getElementById("updated").textContent = H.updated ? "Updated " + new Date(H.updated).toLocaleString("en-AU", { timeZone: P.timezone, dateStyle: "medium", timeStyle: "short", timeZoneName: "short" }) : "";
+  document.getElementById("updated").textContent = H.updated ? "Updated " + new Date(H.updated).toLocaleString("en-AU", { timeZone: P.timezone, day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" }) : "";
   document.getElementById("bp-note").textContent = (bp.method === "all"
     ? "Each point is the average of all readings in that session."
     : `Each point is the average of the ${bp.keep ?? 2} lowest readings in that session.`)
@@ -98,7 +97,7 @@
       { label: "Resting HR", value: fmt(avg(cur, (d) => d.restingHr)), unit: "bpm", sub: delta((d) => d.restingHr, 0, true) },
       { label: "HR low / high", value: `${lows.length ? Math.min(...lows) : "—"}/${highs.length ? Math.max(...highs) : "—"}`, unit: "bpm", sub: `avg nightly low ${fmt(avg(cur, (d) => d.minHr))}` },
       { label: "HRV", value: fmt(avg(cur, (d) => d.hrv)), unit: "ms", sub: delta((d) => d.hrv, 0, false, " ms") },
-      { label: "Sleep", value: fmt(avg(cur, (d) => d.sleepHrs), 1), unit: "h", sub: delta((d) => d.sleepHrs, 1, false, " h"), extra: `Score ${fmt(avg(cur, (d) => d.sleepScore))}${estScore ? " (est.)" : ""}` },
+      { label: "Sleep", value: fmt(avg(cur, (d) => d.sleepHrs), 1), unit: "h", sub: delta((d) => d.sleepHrs, 1, false, " h") },
     ];
     document.getElementById("tiles").innerHTML = tiles.map((t) => `
       <div class="card tile"><div class="label">${t.label}</div>
@@ -118,7 +117,9 @@
         y: { grid: { color: css("--grid") }, border: { display: false }, ...y },
       },
     });
-    const line = (label, data, color, o = {}) => ({ label, data, borderColor: color, backgroundColor: color, borderWidth: 2, pointRadius: n <= 7 ? 4 : 0, pointHoverRadius: 5, tension: 0.3, spanGaps: true, ...o });
+    // Dots on short periods, and on sparse series where a lone reading would draw no line
+    const line = (label, data, color, o = {}) => ({ label, data, borderColor: color, backgroundColor: color, borderWidth: 2,
+      pointRadius: n <= 7 || data.filter((v) => v != null).length < 10 ? 4 : 0, pointHoverRadius: 5, tension: 0.3, spanGaps: true, ...o });
 
     // shaded normal band for BP
     const bandPlugin = (lo, hi) => ({ id: "band", beforeDatasetsDraw(c) {
@@ -133,9 +134,9 @@
     charts.push(new Chart(canvases.weight, { type: "line", data: { labels, datasets: [line("Weight kg", cur.map((d) => d.weightKg), css("--s1"))] }, options: base() }));
 
     charts.push(new Chart(canvases.hr, { type: "line", data: { labels, datasets: [
-      line("Highest", cur.map((d) => d.maxHr), css("--axis"), { borderWidth: 1, pointRadius: 0, fill: "+1", backgroundColor: css("--grid") }),
-      line("Lowest", cur.map((d) => d.minHr), css("--axis"), { borderWidth: 1, pointRadius: 0 }),
-      line("Resting", cur.map((d) => d.restingHr), css("--s1")),
+      line("Highest", cur.map((d) => d.maxHr), css("--axis"), { borderWidth: 1, pointRadius: 0, fill: "+1", backgroundColor: css("--grid"), order: 2 }),
+      line("Lowest", cur.map((d) => d.minHr), css("--axis"), { borderWidth: 1, pointRadius: 0, order: 2 }),
+      line("Resting", cur.map((d) => d.restingHr), css("--s1"), { order: 1 }), // lower order draws on top of the band
     ] }, options: base({ suggestedMin: 40 }) }));
 
     charts.push(new Chart(canvases.hrv, { type: "line", data: { labels, datasets: [line("HRV ms", cur.map((d) => d.hrv), css("--s7"))] }, options: base() }));
@@ -152,10 +153,10 @@
     const rows = [...cur].reverse().map((d) => `<tr><td class="date">${day(d.date, { weekday: "short", day: "numeric", month: "short" })}</td>
       ${heat("weight_kg", d.weightKg, 1)}${heat("bmi", d.bmi, 1)}${bpCell(d.bpAm)}${bpCell(d.bpPm)}
       ${heat("resting_hr", d.restingHr)}${heat("min_hr", d.minHr)}${heat("max_hr", d.maxHr)}${heat("hrv", d.hrv)}
-      ${heat("sleep_hours", d.sleepHrs, 1)}${heat("sleep_score", d.sleepScore)}${heat("spo2", d.spo2, 1)}</tr>`).join("");
+      ${heat("sleep_hours", d.sleepHrs, 1)}${heat("spo2", d.spo2, 1)}</tr>`).join("");
     document.getElementById("log").innerHTML = `<thead>
-      <tr class="group"><th></th><th colspan="2">Body</th><th colspan="2">BP mmHg</th><th colspan="4">Heart</th><th colspan="3">Sleep</th></tr>
-      <tr><th>Date</th><th>Weight</th><th>BMI</th><th>AM</th><th>PM</th><th>Resting</th><th>Low</th><th>High</th><th>HRV</th><th>Hours</th><th>Score${estScore ? " (est.)" : ""}</th><th>SpO₂</th></tr></thead><tbody>${rows}</tbody>`;
+      <tr class="group"><th></th><th colspan="2">Body</th><th colspan="2">BP mmHg</th><th colspan="4">Heart</th><th colspan="2">Sleep</th></tr>
+      <tr><th>Date</th><th>Weight</th><th>BMI</th><th>AM</th><th>PM</th><th>Resting</th><th>Low</th><th>High</th><th>HRV</th><th>Hours</th><th>SpO₂</th></tr></thead><tbody>${rows}</tbody>`;
   }
 
   document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => {

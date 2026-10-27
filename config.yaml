@@ -65,9 +65,6 @@ heart_rate:
   smoothing_minutes: 5
   low_from: sleep             # sleep | all_day
 
-sleep:
-  score_source: estimate      # Google Health doesn't expose the Fitbit app's score; this approximates it
-
 dashboard:
   title: Health Dashboard
   default_period_days: 30
@@ -135,11 +132,6 @@ thresholds:
       - { below: 7,   level: warning, label: Below 7 h }
       - { below: 9.5, level: good,    label: On target }
       - {             level: warning, label: Long }
-  sleep_score:
-    bands:
-      - { below: 60, level: serious, label: Poor }
-      - { below: 80, level: warning, label: Fair }
-      - {            level: good,    label: Good }
   spo2:
     bands:
       - { below: 90, level: critical, label: Low }
