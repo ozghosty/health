@@ -12,6 +12,7 @@ import re
 import shutil
 import subprocess
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import yaml
 
@@ -34,7 +35,13 @@ def main():
     data = json.loads(data_file.read_text(encoding="utf-8")) if data_file.exists() else {"days": []}
 
     history = cfg.get("dashboard", {}).get("history_days", 365)
-    cutoff = (dt.date.today() - dt.timedelta(days=history)).isoformat()
+    today = dt.datetime.now(ZoneInfo(cfg["profile"].get("timezone", "UTC"))).date()
+    cutoff = (today - dt.timedelta(days=history)).isoformat()
+    # BMI follows the height in config.yaml, so changing it fixes every day without a re-fetch
+    height = cfg["profile"].get("height_cm")
+    for d in data.get("days", []):
+        if d.get("weightKg") and height:
+            d["bmi"] = round(d["weightKg"] / (height / 100) ** 2, 1)
     sources = cfg.get("sources", {})
     out = {
         "updated": data.get("updated"),

@@ -8,14 +8,14 @@ profile:
   name: OzGhosty              # shown in the header
   birth_year: 1984            # age shown is accurate to within a year
   sex: male                   # male | female; used for reference ranges (body fat, HRV)
-  height_cm: 180              # Withings stores height too, but this wins if set
+  height_cm: 185              # Withings stores height too, but this wins if set
   timezone: Australia/Sydney  # decides which calendar day and AM/PM a reading falls in
   # Optional extras a clinician may want at a glance
   conditions: []              # e.g. [hypertension]
   medications: []             # e.g. ["Perindopril 5 mg mornings"]
 
 goals:
-  weight_kg: 82
+  weight_kg: 75
   bp_systolic: 120
   bp_diastolic: 80
   sleep_hours: 7.5
@@ -154,7 +154,7 @@ sources:
   # down in Oct/Nov 2026. Needs a Google account linked in the Google Health app.
   fitbit:
     enabled: true
-    measures: [resting_hr, intraday_hr, hrv, sleep, spo2, breathing_rate, steps, vo2max]
+    measures: [resting_hr, intraday_hr, hrv, sleep, spo2, breathing_rate, steps]  # also: vo2max
 
 fetch:
   lookback_days: 7            # each run re-reads this many days, catching late syncs

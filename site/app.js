@@ -54,7 +54,7 @@
     ["Height", P.height_cm && P.height_cm + " cm"], ["Goal weight", G.weight_kg && G.weight_kg + " kg"],
     ["Conditions", (P.conditions || []).join(", ")], ["Medications", (P.medications || []).join("; ")],
   ].filter(([, v]) => v).map(([k, v]) => `<span>${k} <b>${esc(v)}</b></span>`).join("");
-  document.getElementById("updated").textContent = H.updated ? "Updated " + new Date(H.updated).toLocaleString("en-AU") : "";
+  document.getElementById("updated").textContent = H.updated ? "Updated " + new Date(H.updated).toLocaleString("en-AU", { timeZone: P.timezone, dateStyle: "medium", timeStyle: "short", timeZoneName: "short" }) : "";
   document.getElementById("bp-note").textContent = (bp.method === "all"
     ? "Each point is the average of all readings in that session."
     : `Each point is the average of the ${bp.keep ?? 2} lowest readings in that session.`)

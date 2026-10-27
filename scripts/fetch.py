@@ -277,7 +277,11 @@ def gh_sleep(token, start, end, tz):
     utc = lambda d: dt.datetime.combine(d, dt.time(), tz).astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     filt = f'sleep.interval.end_time >= "{utc(start)}" AND sleep.interval.end_time < "{utc(end)}"'
     nights, intervals = {}, {}
-    for s in gh_list(token, "sleep", filt, 25):
+    points = gh_list(token, "sleep", filt, 25)
+    # Field names only (no values), to spot a sleep score if Google ever adds one
+    log("  sleep fields: " + ", ".join(sorted({k for s in points for k in s}))
+        + " | summary: " + ", ".join(sorted({k for s in points for k in s.get("summary", {})})))
+    for s in points:
         meta = s.get("metadata", {})
         if meta.get("nap") or meta.get("mainSleep") is False:
             continue
