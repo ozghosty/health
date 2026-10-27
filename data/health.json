@@ -1,6 +1,6 @@
 {
   "repo": "ozghosty/health",
-  "updated": "2026-10-27T04:08:20Z",
+  "updated": "2026-10-27T04:35:04Z",
   "days": [
     {"date":"2025-10-30","restingHr":66,"hrv":88,"spo2":96.8,"breathingRate":16.8,"steps":9828},
     {"date":"2025-10-31","restingHr":63,"steps":10355,"sleepHrs":7.2,"deepMin":88,"remMin":77,"lightMin":268,"awakeMin":16,"sleepScore":90},
@@ -50,8 +50,8 @@
     {"date":"2026-01-13","restingHr":61,"hrv":68,"spo2":97.1,"breathingRate":16,"steps":16081,"sleepHrs":6.9,"deepMin":63,"remMin":55,"lightMin":298,"awakeMin":22,"sleepScore":81},
     {"date":"2026-01-14","restingHr":62,"hrv":70,"spo2":97.2,"breathingRate":17.2,"steps":14495,"sleepHrs":5.9,"deepMin":57,"remMin":49,"lightMin":247,"awakeMin":27,"sleepScore":74},
     {"date":"2026-01-15","restingHr":61,"hrv":83,"breathingRate":17,"steps":3116,"sleepHrs":8.0,"deepMin":78,"remMin":85,"lightMin":316,"awakeMin":27,"sleepScore":91},
-    {"date":"2026-01-17","weightKg":72.2,"fatPct":14.1,"bmi":22.3,"restingHr":61,"spo2":97.1,"steps":4158},
-    {"date":"2026-01-18","weightKg":75.1,"bmi":23.2,"restingHr":61,"hrv":69,"spo2":95.8,"breathingRate":16.4,"steps":14565,"sleepHrs":7.3,"deepMin":74,"remMin":62,"lightMin":304,"awakeMin":28,"sleepScore":84},
+    {"date":"2026-01-17","weightKg":72.2,"fatPct":14.1,"bmi":21.1,"restingHr":61,"spo2":97.1,"steps":4158},
+    {"date":"2026-01-18","weightKg":75.1,"bmi":21.9,"restingHr":61,"hrv":69,"spo2":95.8,"breathingRate":16.4,"steps":14565,"sleepHrs":7.3,"deepMin":74,"remMin":62,"lightMin":304,"awakeMin":28,"sleepScore":84},
     {"date":"2026-01-19","restingHr":64,"hrv":46,"spo2":96,"breathingRate":16.6,"steps":14719,"sleepHrs":8.1,"deepMin":97,"remMin":57,"lightMin":333,"awakeMin":73,"sleepScore":82},
     {"date":"2026-01-20","restingHr":63,"hrv":57,"spo2":96.7,"breathingRate":17,"steps":15313,"sleepHrs":4.7,"deepMin":69,"remMin":24,"lightMin":185,"awakeMin":42,"sleepScore":62},
     {"date":"2026-01-21","restingHr":62,"hrv":66,"spo2":96.8,"breathingRate":16.2,"steps":5765,"sleepHrs":5.1,"deepMin":61,"remMin":49,"lightMin":194,"awakeMin":48,"sleepScore":66},
@@ -101,7 +101,7 @@
     {"date":"2026-03-06","restingHr":63,"hrv":52,"spo2":96.4,"breathingRate":15.4,"steps":9571,"sleepHrs":5.5,"deepMin":53,"remMin":58,"lightMin":218,"awakeMin":107,"sleepScore":56},
     {"date":"2026-03-07","restingHr":61,"hrv":101,"spo2":96.4,"breathingRate":15.8,"steps":16552,"sleepHrs":8.6,"deepMin":55,"remMin":86,"lightMin":372,"awakeMin":41,"sleepScore":85},
     {"date":"2026-03-08","restingHr":61,"hrv":94,"spo2":96,"breathingRate":16.2,"steps":13222,"sleepHrs":8.2,"deepMin":70,"remMin":74,"lightMin":348,"awakeMin":24,"sleepScore":89},
-    {"date":"2026-03-09","weightKg":72.8,"fatPct":14.0,"bmi":22.5,"restingHr":62,"hrv":76,"spo2":96.8,"breathingRate":15.6,"steps":18248,"sleepHrs":6.6,"deepMin":23,"remMin":53,"lightMin":318,"awakeMin":50,"sleepScore":67},
+    {"date":"2026-03-09","weightKg":72.8,"fatPct":14.0,"bmi":21.3,"restingHr":62,"hrv":76,"spo2":96.8,"breathingRate":15.6,"steps":18248,"sleepHrs":6.6,"deepMin":23,"remMin":53,"lightMin":318,"awakeMin":50,"sleepScore":67},
     {"date":"2026-03-10","restingHr":62,"hrv":72,"spo2":96.6,"breathingRate":16,"steps":16671,"sleepHrs":7.0,"deepMin":64,"remMin":70,"lightMin":286,"awakeMin":17,"sleepScore":85},
     {"date":"2026-03-11","restingHr":63,"hrv":61,"spo2":96.6,"breathingRate":16.2,"steps":14740,"sleepHrs":6.6,"deepMin":79,"remMin":60,"lightMin":257,"awakeMin":31,"sleepScore":81},
     {"date":"2026-03-12","restingHr":65,"hrv":54,"spo2":96.7,"breathingRate":16.6,"steps":17259,"sleepHrs":5.8,"deepMin":84,"remMin":42,"lightMin":223,"awakeMin":14,"sleepScore":80},
@@ -291,15 +291,15 @@
     {"date":"2026-09-12","restingHr":67,"hrv":46,"spo2":96.7,"breathingRate":14,"steps":11316,"sleepHrs":7.8,"deepMin":87,"remMin":72,"lightMin":311,"awakeMin":35,"sleepScore":88},
     {"date":"2026-09-13","restingHr":69,"hrv":43,"spo2":96.8,"breathingRate":17.2,"steps":7991,"sleepHrs":6.0,"deepMin":55,"remMin":69,"lightMin":232,"awakeMin":21,"sleepScore":78},
     {"date":"2026-09-14","restingHr":68,"hrv":52,"spo2":97.1,"breathingRate":16.4,"steps":15926,"sleepHrs":9.7,"deepMin":61,"remMin":95,"lightMin":426,"awakeMin":70,"sleepScore":81},
-    {"date":"2026-09-15","weightKg":73.5,"bmi":22.7,"restingHr":69,"hrv":29,"spo2":97.2,"breathingRate":16.6,"steps":13130,"sleepHrs":7.5,"deepMin":91,"remMin":71,"lightMin":289,"awakeMin":13,"sleepScore":92},
+    {"date":"2026-09-15","weightKg":73.5,"bmi":21.5,"restingHr":69,"hrv":29,"spo2":97.2,"breathingRate":16.6,"steps":13130,"sleepHrs":7.5,"deepMin":91,"remMin":71,"lightMin":289,"awakeMin":13,"sleepScore":92},
     {"date":"2026-09-16","restingHr":69,"hrv":41,"spo2":96.4,"breathingRate":17.2,"steps":7024,"sleepHrs":5.8,"deepMin":55,"remMin":53,"lightMin":238,"awakeMin":71,"sleepScore":64},
     {"date":"2026-09-17","restingHr":70,"hrv":42,"spo2":95.8,"breathingRate":16.6,"steps":13716,"sleepHrs":6.1,"deepMin":85,"remMin":78,"lightMin":202,"awakeMin":19,"sleepScore":83},
     {"date":"2026-09-18","restingHr":69,"hrv":36,"spo2":97.4,"breathingRate":16.2,"steps":14012,"sleepHrs":6.5,"deepMin":67,"remMin":83,"lightMin":242,"awakeMin":32,"sleepScore":82},
-    {"date":"2026-09-19","weightKg":72.8,"bmi":22.5,"restingHr":71,"hrv":28,"spo2":97.5,"breathingRate":16,"steps":16853,"sleepHrs":6.5,"deepMin":79,"remMin":58,"lightMin":250,"awakeMin":60,"sleepScore":74},
-    {"date":"2026-09-20","weightKg":71.7,"bmi":22.1,"restingHr":70,"hrv":45,"spo2":96.2,"breathingRate":15.8,"steps":12096,"sleepHrs":9.1,"deepMin":65,"remMin":112,"lightMin":366,"awakeMin":81,"sleepScore":82},
-    {"date":"2026-09-21","weightKg":72.8,"bmi":22.5,"restingHr":69,"hrv":39,"spo2":98.8,"breathingRate":16.4,"steps":12068,"sleepHrs":8.4,"deepMin":91,"remMin":109,"lightMin":301,"awakeMin":111,"sleepScore":82},
-    {"date":"2026-09-22","weightKg":73.7,"bmi":22.7,"restingHr":67,"hrv":48,"spo2":96,"breathingRate":15.6,"steps":12819,"sleepHrs":7.3,"deepMin":100,"remMin":73,"lightMin":268,"awakeMin":14,"sleepScore":92},
-    {"date":"2026-09-23","weightKg":73.7,"bmi":22.7,"restingHr":65,"hrv":59,"spo2":94.7,"breathingRate":16.4,"steps":12287,"sleepHrs":8.0,"deepMin":103,"remMin":73,"lightMin":302,"awakeMin":32,"sleepScore":92},
+    {"date":"2026-09-19","weightKg":72.8,"bmi":21.3,"restingHr":71,"hrv":28,"spo2":97.5,"breathingRate":16,"steps":16853,"sleepHrs":6.5,"deepMin":79,"remMin":58,"lightMin":250,"awakeMin":60,"sleepScore":74},
+    {"date":"2026-09-20","weightKg":71.7,"bmi":20.9,"restingHr":70,"hrv":45,"spo2":96.2,"breathingRate":15.8,"steps":12096,"sleepHrs":9.1,"deepMin":65,"remMin":112,"lightMin":366,"awakeMin":81,"sleepScore":82},
+    {"date":"2026-09-21","weightKg":72.8,"bmi":21.3,"restingHr":69,"hrv":39,"spo2":98.8,"breathingRate":16.4,"steps":12068,"sleepHrs":8.4,"deepMin":91,"remMin":109,"lightMin":301,"awakeMin":111,"sleepScore":82},
+    {"date":"2026-09-22","weightKg":73.7,"bmi":21.5,"restingHr":67,"hrv":48,"spo2":96,"breathingRate":15.6,"steps":12819,"sleepHrs":7.3,"deepMin":100,"remMin":73,"lightMin":268,"awakeMin":14,"sleepScore":92},
+    {"date":"2026-09-23","weightKg":73.7,"bmi":21.5,"restingHr":65,"hrv":59,"spo2":94.7,"breathingRate":16.4,"steps":12287,"sleepHrs":8.0,"deepMin":103,"remMin":73,"lightMin":302,"awakeMin":32,"sleepScore":92},
     {"date":"2026-09-24","restingHr":66,"hrv":40,"spo2":97,"breathingRate":15.6,"steps":13831,"sleepHrs":5.4,"deepMin":81,"remMin":52,"lightMin":191,"awakeMin":50,"sleepScore":70},
     {"date":"2026-09-25","restingHr":66,"hrv":39,"spo2":96.9,"breathingRate":16.8,"steps":13016,"sleepHrs":6.2,"deepMin":83,"remMin":96,"lightMin":195,"awakeMin":21,"sleepScore":84},
     {"date":"2026-09-26","restingHr":67,"hrv":38,"spo2":96.6,"breathingRate":16.4,"steps":15047,"sleepHrs":6.9,"deepMin":87,"remMin":62,"lightMin":264,"awakeMin":12,"sleepScore":88},
@@ -333,6 +333,6 @@
     {"date":"2026-10-24","restingHr":62,"hrv":60,"spo2":97.2,"breathingRate":15.8,"steps":25565,"sleepHrs":5.6,"deepMin":42,"remMin":71,"lightMin":225,"awakeMin":69,"sleepScore":64,"maxHr":160,"minHr":51},
     {"date":"2026-10-25","restingHr":64,"hrv":37,"spo2":97.2,"breathingRate":17.2,"steps":8125,"sleepHrs":8.7,"deepMin":90,"remMin":118,"lightMin":311,"awakeMin":17,"sleepScore":97,"maxHr":132,"minHr":56},
     {"date":"2026-10-26","restingHr":66,"hrv":42,"spo2":97.2,"breathingRate":16,"steps":12653,"sleepHrs":7.0,"deepMin":83,"remMin":95,"lightMin":241,"awakeMin":29,"sleepScore":87,"maxHr":137,"minHr":52},
-    {"date":"2026-10-27","bpAm":{"sys":129,"dia":78,"pulse":81,"readings":[{"sys":126,"dia":77,"pulse":91,"used":true},{"sys":132,"dia":78,"pulse":71,"used":true}]},"restingHr":67,"hrv":38,"breathingRate":16.6,"steps":5093,"sleepHrs":7.2,"deepMin":70,"remMin":88,"lightMin":273,"awakeMin":76,"sleepScore":78,"maxHr":101,"minHr":55}
+    {"date":"2026-10-27","bpAm":{"sys":129,"dia":78,"pulse":81,"readings":[{"sys":126,"dia":77,"pulse":91,"used":true},{"sys":132,"dia":78,"pulse":71,"used":true}]},"restingHr":67,"hrv":38,"breathingRate":16.6,"steps":5341,"sleepHrs":7.2,"deepMin":70,"remMin":88,"lightMin":273,"awakeMin":76,"sleepScore":78,"maxHr":101,"minHr":55,"weightKg":74.4,"bmi":21.7}
   ]
 }
