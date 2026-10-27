@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Health Report Card</title>
+<script>try { var t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kaushan+Script&display=swap">
+<link rel="stylesheet" href="theme.css">
+<style>
+  :root { --ink: var(--text); --ink-2: var(--text-muted); --muted: var(--text-faint); --surface: var(--card); --grid: var(--border); --wash: color-mix(in srgb, var(--accent) 14%, transparent); }
+  .wrap { max-width: var(--container); margin: 0 auto; padding: 28px 16px 0; display: grid; grid-template-columns: 290px 1fr; gap: 20px; align-items: start; }
+  @media (min-width: 700px) { .wrap { padding: 28px 24px 0; } }
+  @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } }
+  .card { padding: 20px; }
+  h2 { font-size: 17px; color: var(--text); margin: 0 0 14px; font-weight: 700; }
+
+  aside { position: sticky; top: 84px; display: grid; gap: 16px; }
+  @media (max-width: 860px) { aside { position: static; } }
+  .avatar { width: 64px; height: 64px; border-radius: 50%; background: var(--wash); color: var(--accent); display: grid; place-items: center; font-weight: 700; font-size: 20px; margin-bottom: 10px; }
+  .who h1 { margin: 0; font-size: 22px; font-weight: 800; }
+  dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 12px 0 0; }
+  dt { color: var(--muted); } dd { margin: 0; text-align: right; font-weight: 500; }
+  .notes { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+  .notes li { display: grid; grid-template-columns: 20px 1fr; gap: 6px; }
+  .notes .ic { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #fff; }
+  .notes .ic.warning { color: #0b0b0b; }
+  .notes small { color: var(--muted); display: block; }
+
+  main { display: grid; gap: 16px; min-width: 0; }
+  main > .card { overflow-x: auto; }
+  .results { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .results th { text-align: left; font-size: 12px; color: var(--muted); font-weight: 500; padding: 0 8px 8px; border-bottom: 1px solid var(--grid); }
+  .results td { padding: 10px 8px; border-bottom: 1px solid var(--grid); vertical-align: middle; }
+  .results tr.section td { padding-top: 18px; font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: .12em; border-bottom: 0; text-transform: uppercase; letter-spacing: .04em; }
+  .results .metric { font-weight: 550; } .results .metric small { display: block; color: var(--muted); font-weight: 400; }
+  .results .num { text-align: right; white-space: nowrap; } .results .num b { font-size: 16px; }
+  .results .ref { color: var(--muted); font-size: 12px; white-space: nowrap; }
+  .status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; white-space: nowrap; color: var(--ink-2); }
+  .status i { width: 8px; height: 8px; border-radius: 50%; }
+  .spark { width: 140px; height: 32px; display: block; }
+  @media (max-width: 640px) { .hide-sm { display: none; } }
+
+  .sessions { display: grid; gap: 6px; font-variant-numeric: tabular-nums; }
+  .sess { display: grid; grid-template-columns: 96px 30px 1fr 110px; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--grid); }
+  .sess .when { color: var(--ink-2); }
+  .sess .tag { font-size: 11px; color: var(--muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+  .chip { font-size: 12px; padding: 2px 7px; border-radius: 999px; border: 1px solid var(--grid); color: var(--muted); text-decoration: line-through; }
+  .chip.used { text-decoration: none; color: var(--ink); background: var(--wash); border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); font-weight: 600; }
+  .sess .avg { text-align: right; font-weight: 650; }
+  .scroll { overflow-x: auto; }
+  .weekly { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .weekly th, .weekly td { padding: 6px 8px; text-align: right; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+  .weekly th:first-child, .weekly td:first-child { text-align: left; }
+  .weekly th { color: var(--ink-2); font-size: 12px; font-weight: 600; }
+  @media print { aside { position: static; } body { background: #fff; } }
+</style>
+</head>
+<body>
+<header class="site-header"></header>
+<div class="wrap">
+  <aside>
+    <div class="card who">
+      <div class="avatar" id="initials"></div>
+      <h1 id="name"></h1>
+      <dl id="facts"></dl>
+    </div>
+    <div class="card">
+      <div class="kicker" style="margin-bottom:6px">Last 30 days</div><h2>Worth noting</h2>
+      <ul class="notes" id="notes"></ul>
+    </div>
+  </aside>
+
+  <main>
+    <section class="card">
+      <h2>Results · 30-day average vs previous 30</h2>
+      <table class="results" id="results"></table>
+    </section>
+
+    <section class="card">
+      <h2>Blood pressure sessions · last 7 days</h2>
+      <p style="margin:-6px 0 10px;color:var(--muted);font-size:12px">Highlighted = two lowest readings kept and averaged. Struck through = discarded.</p>
+      <div class="sessions" id="sessions"></div>
+    </section>
+
+    <section class="card">
+      <h2>Weekly averages</h2>
+      <div class="scroll"><table class="weekly" id="weekly"></table></div>
+    </section>
+  </main>
+</div>
+<footer class="site-footer"></footer>
+
+<script src="mock-data.js"></script>
+<script src="site-chrome.js"></script>
+<script>
+const H = window.HEALTH, P = H.profile, D = H.days;
+const fmt = (v, dp = 0) => v == null ? "—" : v.toFixed(dp);
+const cur = D.slice(-30), prev = D.slice(-60, -30);
+const avg = (arr, f) => H.mean(arr.map(f));
+
+document.getElementById("initials").textContent = P.name.split(" ").map((w) => w[0]).join("");
+document.getElementById("name").textContent = P.name;
+const lastW = [...D].reverse().find((d) => d.weightKg);
+document.getElementById("facts").innerHTML = [
+  ["Age", H.age()], ["Sex", P.sex], ["Height", P.heightCm + " cm"], ["Weight", lastW.weightKg + " kg"],
+  ["BMI", lastW.bmi], ["Updated", new Date(H.updated).toLocaleDateString()],
+].map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
+
+function spark(values, color = "var(--accent)") {
+  const v = values.map((x, i) => [i, x]).filter(([, x]) => x != null);
+  const ys = v.map(([, y]) => y), lo = Math.min(...ys), hi = Math.max(...ys), w = 140, h = 32, pad = 3;
+  const X = (i) => pad + (i / (values.length - 1)) * (w - 2 * pad), Y = (y) => h - pad - ((y - lo) / (hi - lo || 1)) * (h - 2 * pad);
+  const d = v.map(([i, y], k) => `${k ? "L" : "M"}${X(i).toFixed(1)},${Y(y).toFixed(1)}`).join("");
+  const [li, ly] = v[v.length - 1];
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" aria-hidden="true"><path d="${d}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>
+    <circle cx="${X(li)}" cy="${Y(ly)}" r="2.5" fill="${color}"/></svg>`;
+}
+const status = (c) => c ? `<span class="pill ${c.key}"><i></i>${c.label}</span>` : "";
+const trendStatus = (a, b, lowerIsBetter, tol) => {
+  if (a == null || b == null) return null;
+  const d = a - b; if (Math.abs(d) < tol) return { key: "good", label: "Stable" };
+  return (d < 0) === lowerIsBetter ? { key: "good", label: "Improving" } : { key: "warning", label: "Worsening" };
+};
+
+const rows = [
+  ["Body"],
+  { name: "Weight", unit: "kg", f: (d) => d.weightKg, dp: 1, ref: "goal " + P.goals.weightKg, st: () => trendStatus(avg(cur, (d) => d.weightKg), avg(prev, (d) => d.weightKg), true, 0.3) },
+  { name: "BMI", unit: "kg/m²", f: (d) => d.bmi, dp: 1, ref: "18.5 – 24.9", st: (a) => H.bmiCategory(a) },
+  { name: "Body fat", unit: "%", f: (d) => d.fatPct, dp: 1, ref: "10 – 20", st: () => trendStatus(avg(cur, (d) => d.fatPct), avg(prev, (d) => d.fatPct), true, 0.3) },
+  ["Blood pressure"],
+  { name: "Morning", unit: "mmHg", src: "avg of 2 lowest", bp: "bpAm", ref: "< 120 / 80" },
+  { name: "Evening", unit: "mmHg", src: "avg of 2 lowest", bp: "bpPm", ref: "< 120 / 80" },
+  ["Heart"],
+  { name: "Resting heart rate", unit: "bpm", f: (d) => d.restingHr, ref: "60 – 100*", st: () => trendStatus(avg(cur, (d) => d.restingHr), avg(prev, (d) => d.restingHr), true, 1) },
+  { name: "Lowest (sleep)", unit: "bpm", f: (d) => d.minHr, ref: "", agg: (a) => Math.min(...a), aggLabel: "min" },
+  { name: "Highest", unit: "bpm", f: (d) => d.maxHr, ref: "max ≈ " + (220 - H.age()), agg: (a) => Math.max(...a), aggLabel: "max" },
+  { name: "HRV (RMSSD)", unit: "ms", f: (d) => d.hrv, ref: "age-dependent", st: () => trendStatus(avg(cur, (d) => d.hrv), avg(prev, (d) => d.hrv), false, 2) },
+  { name: "SpO₂ (sleep)", unit: "%", f: (d) => d.spo2, dp: 1, ref: "95 – 100", st: (a) => a >= 95 ? { key: "good", label: "Normal" } : { key: "warning", label: "Low" } },
+  ["Sleep"],
+  { name: "Time asleep", unit: "h", f: (d) => d.sleepHrs, dp: 1, ref: "7 – 9", st: (a) => a >= 7 ? { key: "good", label: "On target" } : { key: "warning", label: "Below 7 h" } },
+  { name: "Sleep score", unit: "/100", f: (d) => d.sleepScore, ref: "80+ good", st: (a) => a >= 80 ? { key: "good", label: "Good" } : a >= 60 ? { key: "warning", label: "Fair" } : { key: "serious", label: "Poor" } },
+];
+
+document.getElementById("results").innerHTML = `<thead><tr><th>Measure</th><th class="num">Value</th><th class="num hide-sm">Prev 30d</th><th class="hide-sm">Reference</th><th class="hide-sm">90-day trend</th><th>Status</th></tr></thead><tbody>` +
+  rows.map((r) => {
+    if (Array.isArray(r)) return `<tr class="section"><td colspan="6">${r[0]}</td></tr>`;
+    if (r.bp) {
+      const s = (a) => [avg(a, (d) => d[r.bp]?.sys), avg(a, (d) => d[r.bp]?.dia)];
+      const [cs, cd] = s(cur), [ps, pd] = s(prev);
+      return `<tr><td class="metric">${r.name}<small>${r.unit} · ${r.src}</small></td><td class="num"><b>${fmt(cs)}/${fmt(cd)}</b></td>
+        <td class="num hide-sm">${fmt(ps)}/${fmt(pd)}</td><td class="ref hide-sm">${r.ref}</td><td class="hide-sm">${spark(D.map((d) => d[r.bp]?.sys))}</td><td>${status(H.bpCategory(cs, cd))}</td></tr>`;
+    }
+    const vals = cur.map(r.f).filter((x) => x != null), pv = prev.map(r.f).filter((x) => x != null);
+    const a = r.agg ? r.agg(vals) : H.mean(vals), b = r.agg ? r.agg(pv) : H.mean(pv);
+    return `<tr><td class="metric">${r.name}<small>${r.unit}${r.aggLabel ? " · 30-day " + r.aggLabel : ""}</small></td><td class="num"><b>${fmt(a, r.dp)}</b></td>
+      <td class="num hide-sm">${fmt(b, r.dp)}</td><td class="ref hide-sm">${r.ref}</td><td class="hide-sm">${spark(D.map(r.f))}</td><td>${r.st ? status(r.st(a)) : ""}</td></tr>`;
+  }).join("") + `</tbody>`;
+
+// Auto-generated observations
+const notes = [];
+const amS = avg(cur, (d) => d.bpAm?.sys), amD = avg(cur, (d) => d.bpAm?.dia), pmS = avg(cur, (d) => d.bpPm?.sys), pmD = avg(cur, (d) => d.bpPm?.dia);
+const amC = H.bpCategory(amS, amD);
+if (amC.key !== "good") notes.push([amC.key, "!", `Morning BP averages ${fmt(amS)}/${fmt(amD)} (${amC.label})`, `Evening ${fmt(pmS)}/${fmt(pmD)} — morning runs ${fmt(amS - pmS)} mmHg higher`]);
+const wd = avg(cur, (d) => d.weightKg) - avg(prev, (d) => d.weightKg);
+notes.push(["good", "✓", `Weight ${wd < 0 ? "down" : "up"} ${fmt(Math.abs(wd), 1)} kg vs previous 30 days`, `BMI ${lastW.bmi}`]);
+const hd = avg(cur, (d) => d.hrv) - avg(prev, (d) => d.hrv);
+notes.push([hd >= 0 ? "good" : "warning", hd >= 0 ? "✓" : "!", `HRV ${hd >= 0 ? "up" : "down"} ${fmt(Math.abs(hd))} ms`, `Resting HR ${fmt(avg(cur, (d) => d.restingHr))} bpm`]);
+const short = cur.filter((d) => d.sleepHrs < 6).length;
+if (short) notes.push(["warning", "!", `${short} night${short > 1 ? "s" : ""} under 6 hours sleep`, `Average ${fmt(avg(cur, (d) => d.sleepHrs), 1)} h`]);
+const bpDays = cur.filter((d) => d.bpAm || d.bpPm).length;
+notes.push(["good", "i", `BP measured on ${bpDays} of 30 days`, "5 readings per session"]);
+document.getElementById("notes").innerHTML = notes.map(([k, ic, t, s]) =>
+  `<li><span class="ic ${k}" style="background:var(--${k})">${ic}</span><div>${t}<small>${s}</small></div></li>`).join("");
+
+// BP sessions
+document.getElementById("sessions").innerHTML = D.slice(-7).reverse().flatMap((d) => [["AM", d.bpAm], ["PM", d.bpPm]].filter(([, s]) => s).map(([t, s]) => {
+  const c = H.bpCategory(s.sys, s.dia);
+  return `<div class="sess"><span class="when">${new Date(d.date).toLocaleDateString("en-AU", { weekday: "short", month: "short", day: "numeric" })}</span><span class="tag">${t}</span>
+    <span class="chips">${s.readings.map((r) => `<span class="chip ${r.used ? "used" : ""}">${r.sys}/${r.dia}</span>`).join("")}</span>
+    <span class="avg">${s.sys}/${s.dia} <br><span class="pill ${c.key}"><i></i>${c.label}</span></span></div>`;
+})).join("");
+
+// Weekly averages (most recent first)
+const weeks = [];
+for (let i = D.length; i > 0 && weeks.length < 12; i -= 7) weeks.push(D.slice(Math.max(0, i - 7), i));
+const wf = (w, f, dp = 0) => fmt(avg(w, f), dp);
+document.getElementById("weekly").innerHTML = `<thead><tr><th>Week ending</th><th>Weight</th><th>BP AM</th><th>BP PM</th><th>Resting HR</th><th>HRV</th><th>Sleep h</th><th>Score</th></tr></thead><tbody>` +
+  weeks.map((w) => `<tr><td>${w[w.length - 1].date}</td><td>${wf(w, (d) => d.weightKg, 1)}</td>
+    <td>${wf(w, (d) => d.bpAm?.sys)}/${wf(w, (d) => d.bpAm?.dia)}</td><td>${wf(w, (d) => d.bpPm?.sys)}/${wf(w, (d) => d.bpPm?.dia)}</td>
+    <td>${wf(w, (d) => d.restingHr)}</td><td>${wf(w, (d) => d.hrv)}</td><td>${wf(w, (d) => d.sleepHrs, 1)}</td><td>${wf(w, (d) => d.sleepScore)}</td></tr>`).join("") + `</tbody>`;
+</script>
+</body>
+</html>

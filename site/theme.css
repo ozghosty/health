@@ -1,0 +1,92 @@
+/* OzGhosty theme tokens, copied from ozghosty.github.io/assets/css/main.css so the
+   dashboard feels like part of the site. Dark-first, with the same light override. */
+:root {
+  --bg: #0a1120; --bg-elev: #0f1829; --card: #0f1a2c; --card-hover: #142036; --border: #1d2a44;
+  --text: #e8eef8; --text-muted: #9fadc4; --text-faint: #6f7d96;
+  --accent: #1e9bff; --accent-hover: #47aeff; --accent-text: #3fa9ff; --on-accent: #ffffff;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --pill-blue: #1d4ed8; --pill-indigo: #4338ca; --pill-green: #0f9f6e; --pill-amber: #f5a524; --pill-purple: #8b3dff;
+  --radius: 14px; --radius-sm: 10px; --container: 1180px;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-script: "Kaushan Script", "Segoe Script", cursive;
+
+  /* Chart roles (dataviz palette, dark steps) */
+  --grid: #1a263d; --axis: #2a3a58; --band: rgba(15, 159, 110, 0.10);
+  --s1: #3fa9ff; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s7: #9085e9;
+  --good: #0ca30c; --warning: #fab219; --serious: #ec835a; --critical: #d03b3b;
+  --good-ink: #2fc46b; --bad-ink: #ff7a7a;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f4f6fb; --bg-elev: #ffffff; --card: #ffffff; --card-hover: #f8faff; --border: #e1e6f0;
+    --text: #0e1628; --text-muted: #4a5873; --text-faint: #7a879e;
+    --accent: #0b84f3; --accent-hover: #0a74d6; --accent-text: #0a6fcc;
+    --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    --grid: #e9edf4; --axis: #c9d1df; --band: rgba(15, 159, 110, 0.08);
+    --s1: #0b84f3; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s7: #6250d6;
+    --good-ink: #006300; --bad-ink: #b02a2a;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f4f6fb; --bg-elev: #ffffff; --card: #ffffff; --card-hover: #f8faff; --border: #e1e6f0;
+  --text: #0e1628; --text-muted: #4a5873; --text-faint: #7a879e;
+  --accent: #0b84f3; --accent-hover: #0a74d6; --accent-text: #0a6fcc;
+  --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  --grid: #e9edf4; --axis: #c9d1df; --band: rgba(15, 159, 110, 0.08);
+  --s1: #0b84f3; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s7: #6250d6;
+  --good-ink: #006300; --bad-ink: #b02a2a;
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 15px/1.55 var(--font); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+a { color: inherit; text-decoration: none; }
+h1, h2, h3 { line-height: 1.2; margin: 0; letter-spacing: -0.01em; }
+.container { width: 100%; max-width: var(--container); margin: 0 auto; padding: 0 16px; }
+@media (min-width: 700px) { .container { padding: 0 24px; } }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); }
+
+/* Site header, matching the blog */
+.site-header { position: sticky; top: 0; z-index: 50; background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+.header-inner { display: flex; align-items: center; gap: 24px; height: 64px; }
+.wordmark { font-family: var(--font-script); font-size: 26px; line-height: 1; }
+.nav { display: flex; gap: 32px; margin-left: auto; }
+.nav a { position: relative; padding: 20px 0; font-size: 15px; color: var(--text-muted); font-weight: 500; }
+.nav a:hover { color: var(--text); }
+.nav a.active { color: var(--accent-text); }
+.nav a.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: 14px; height: 2px; border-radius: 2px; background: var(--accent); }
+.icon-btn { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 999px; background: transparent; border: 0; cursor: pointer; color: var(--text); font-size: 18px; }
+.icon-btn:hover { background: var(--card-hover); }
+.wordmark.sans { font-family: var(--font); font-weight: 800; font-size: 20px; }
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.nav + .header-actions { margin-left: 8px; }
+.header-inner > .wordmark + .header-actions { margin-left: auto; }
+.copy-btn { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border)); color: var(--text); font-size: 13.5px; font-weight: 600;
+  transition: background .2s, border-color .2s; white-space: nowrap; }
+.copy-btn:hover { background: color-mix(in srgb, var(--accent) 14%, transparent); border-color: var(--accent); }
+.gh { width: 16px; height: 16px; flex: none; vertical-align: -3px; }
+.site-footer a:hover { color: var(--text); }
+@media (max-width: 640px) { .nav a:not(.active) { display: none; } .copy-btn span { display: none; } .copy-btn { padding: 8px; } }
+
+.kicker { font-size: 12px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-faint); }
+.kicker span { margin: 0 8px; opacity: 0.7; }
+
+/* Pills, as on the blog's tag pills */
+.pill { --c: var(--pill-blue); display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--c) 45%, var(--border)); background: color-mix(in srgb, var(--c) 12%, transparent);
+  font-size: 12px; font-weight: 500; color: var(--text); white-space: nowrap; }
+.pill i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+.pill.good { --c: var(--good); } .pill.warning { --c: var(--warning); } .pill.serious { --c: var(--serious); } .pill.critical { --c: var(--critical); }
+
+.seg { display: inline-flex; padding: 3px; border: 1px solid var(--border); border-radius: 999px; background: var(--card); }
+.seg button { border: 0; background: transparent; color: var(--text-muted); padding: 6px 14px; border-radius: 999px; font: 500 13px var(--font); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+.site-footer { border-top: 1px solid var(--border); margin-top: 40px; padding: 24px 0 32px; color: var(--text-faint); font-size: 12.5px; }
+.site-footer .container { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+
+.empty { padding: 32px; text-align: center; color: var(--text-muted); }

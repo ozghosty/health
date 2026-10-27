@@ -1,0 +1,162 @@
+# Static settings for the health dashboard. The scheduled GitHub Action reads this
+# file, fetches Withings + Fitbit data, and builds the page. Nothing secret goes here:
+# API client IDs/secrets and refresh tokens live in GitHub Actions secrets.
+
+profile:
+  # This file and data/ are public. Use a nickname, and a birth year rather than a full
+  # date of birth (a full DOB is an identity-verification secret).
+  name: OzGhosty              # shown in the header
+  birth_year: 1984            # age shown is accurate to within a year
+  sex: male                   # male | female; used for reference ranges (body fat, HRV)
+  height_cm: 180              # Withings stores height too, but this wins if set
+  timezone: Australia/Sydney  # decides which calendar day and AM/PM a reading falls in
+  # Optional extras a clinician may want at a glance
+  conditions: []              # e.g. [hypertension]
+  medications: []             # e.g. ["Perindopril 5 mg mornings"]
+
+goals:
+  weight_kg: 82
+  bp_systolic: 120
+  bp_diastolic: 80
+  sleep_hours: 7.5
+  steps: 10000
+
+# Header, nav and footer. Point these at your own site, or delete `nav` for a bare header.
+site:
+  brand: OzGhosty               # wordmark text, top left
+  brand_style: script           # script (handwritten font) | sans
+  home_url: https://ozghosty.github.io/
+  nav:
+    - { title: Home,   url: https://ozghosty.github.io/ }
+    - { title: Blog,   url: https://ozghosty.github.io/blog/ }
+    - { title: Health, url: "", active: true }   # "" = this dashboard
+    - { title: About,  url: https://ozghosty.github.io/about/ }
+  # Button in the top-right corner so visitors can set up their own copy.
+  #   template: "Use this template" (new repo, clean history; needs Settings → Template repository)
+  #   fork:     GitHub fork
+  #   off:      hide it
+  # The repo link is filled in at build time from the repo the Action runs in,
+  # so forks point at themselves without editing anything.
+  copy_button: template
+  copy_button_label: Make your own
+  footer_note: Not a medical device. For discussion with a clinician.
+
+privacy:
+  # Only the date and AM/PM are stored for each BP session, never the clock time,
+  # so the public data doesn't reveal your daily routine.
+  store_reading_times: false
+  password_protect: false     # encrypt the data file so the page needs a passphrase
+
+blood_pressure:
+  # A session is every reading taken within `session_gap_minutes` of the previous one.
+  # Times are used only to group readings into AM/PM and are then discarded.
+  session_gap_minutes: 30
+  am_window: ["04:00", "12:00"]
+  pm_window: ["16:00", "23:59"]
+  discard_first: 0            # always drop this many readings from the start of a session
+  method: lowest              # lowest = average the N lowest; all = average all kept readings
+  keep: 2                     # N for `lowest`
+  rank_by: systolic           # which value decides "lowest": systolic | mean_arterial
+  min_readings: 2             # skip sessions with fewer readings than this
+
+heart_rate:
+  # Fitbit intraday HR is 1-minute resolution. The nightly low/high use a rolling
+  # average so a single bad sample doesn't become "lowest HR = 38".
+  smoothing_minutes: 5
+  low_from: sleep             # sleep | all_day
+
+sleep:
+  score_source: estimate      # Google Health doesn't expose the Fitbit app's score; this approximates it
+
+dashboard:
+  title: Health Dashboard
+  default_period_days: 30
+  history_days: 365           # how many days the page loads; data/health.json keeps everything
+  units: metric               # metric | imperial
+
+# Colour thresholds for the daily-log heat map, the status pills and the reference
+# ranges shown on the page. Bands are read top to bottom: the first band whose `below`
+# the value is under wins, and a band with no `below` catches everything above.
+# Levels: good | warning | serious | critical (green → amber → orange → red).
+# `label` appears in tooltips and pills. Add a metric here and it gets coloured.
+thresholds:
+  weight_kg:
+    mode: delta_from_goal       # compares kg above goals.weight_kg, not raw weight
+    bands:
+      - { below: 1,  level: good,     label: At goal }
+      - { below: 3,  level: warning,  label: Near goal }
+      - { below: 6,  level: serious,  label: Above goal }
+      - {            level: critical, label: Well above goal }
+  bmi:
+    bands:
+      - { below: 18.5, level: warning, label: Underweight }
+      - { below: 25,   level: good,    label: Healthy }
+      - { below: 30,   level: warning, label: Overweight }
+      - {              level: serious, label: Obese }
+  # A BP reading takes the worse of its systolic and diastolic level (AHA 2017).
+  bp_systolic:
+    bands:
+      - { below: 90,  level: warning,  label: Low }
+      - { below: 120, level: good,     label: Normal }
+      - { below: 130, level: warning,  label: Elevated }
+      - { below: 140, level: serious,  label: Stage 1 }
+      - {             level: critical, label: Stage 2 }
+  bp_diastolic:
+    bands:
+      - { below: 60, level: warning,  label: Low }
+      - { below: 80, level: good,     label: Normal }
+      - { below: 90, level: serious,  label: Stage 1 }
+      - {            level: critical, label: Stage 2 }
+  resting_hr:
+    bands:
+      - { below: 40, level: warning, label: Very low }
+      - { below: 70, level: good,    label: Good }
+      - { below: 85, level: warning, label: Raised }
+      - {            level: serious, label: High }
+  min_hr:                       # lowest HR of the night
+    bands:
+      - { below: 38, level: warning, label: Very low }
+      - { below: 65, level: good,    label: Normal }
+      - {            level: warning, label: Raised }
+  max_hr:
+    mode: percent_of_age_max    # % of 220 − age
+    bands:
+      - { below: 85, level: good,    label: Normal }
+      - { below: 95, level: warning, label: Near max }
+      - {            level: serious, label: At/above max }
+  hrv:                          # ms RMSSD; normal values fall with age, so tune to yours
+    bands:
+      - { below: 25, level: serious, label: Low }
+      - { below: 35, level: warning, label: Below average }
+      - {            level: good,    label: Good }
+  sleep_hours:
+    bands:
+      - { below: 6,   level: serious, label: Short }
+      - { below: 7,   level: warning, label: Below 7 h }
+      - { below: 9.5, level: good,    label: On target }
+      - {             level: warning, label: Long }
+  sleep_score:
+    bands:
+      - { below: 60, level: serious, label: Poor }
+      - { below: 80, level: warning, label: Fair }
+      - {            level: good,    label: Good }
+  spo2:
+    bands:
+      - { below: 90, level: critical, label: Low }
+      - { below: 95, level: warning,  label: Below normal }
+      - {            level: good,     label: Normal }
+
+sources:
+  withings:
+    enabled: true
+    measures: [weight, fat_ratio, bmi, systolic, diastolic, heart_pulse]
+  # Fitbit data comes through the Google Health API; the legacy Fitbit Web API shuts
+  # down in Oct/Nov 2026. Needs a Google account linked in the Google Health app.
+  fitbit:
+    enabled: true
+    measures: [resting_hr, intraday_hr, hrv, sleep, spo2, breathing_rate, steps, vo2max]
+
+fetch:
+  lookback_days: 7            # each run re-reads this many days, catching late syncs
+  backfill_days: 365          # first run only; minute-level heart rate backfills 30 days
+# The schedule lives in .github/workflows/update.yml (GitHub can't read it from here).

@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Health Dashboard</title>
+<script>try { var t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kaushan+Script&display=swap">
+<link rel="stylesheet" href="theme.css">
+<style>
+  main.container { padding-top: 28px; }
+  .patient { display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; }
+  .patient h1 { font-size: clamp(26px, 3.4vw, 34px); font-weight: 800; letter-spacing: -0.02em; margin-top: 6px; }
+  .facts { display: flex; flex-wrap: wrap; gap: 4px 20px; color: var(--text-muted); margin-top: 6px; font-size: 14px; }
+  .facts b { color: var(--text); font-weight: 600; }
+  .meta { color: var(--text-faint); font-size: 12.5px; text-align: right; display: grid; gap: 8px; justify-items: end; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; margin-bottom: 20px; }
+  .tile { padding: 16px; transition: border-color .2s; }
+  .tile:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); }
+  .tile .label { color: var(--text-faint); font-size: 11.5px; text-transform: uppercase; letter-spacing: .1em; font-weight: 600; }
+  .tile .value { font-size: 28px; font-weight: 700; margin: 6px 0 2px; letter-spacing: -0.02em; }
+  .tile .value small { font-size: 13px; font-weight: 500; color: var(--text-muted); }
+  .tile .sub { color: var(--text-muted); font-size: 12.5px; }
+  .tile .pill { margin-top: 8px; }
+  .delta.good { color: var(--good-ink); } .delta.bad { color: var(--bad-ink); } .delta.flat { color: var(--text-faint); }
+
+  .charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); gap: 14px; margin-bottom: 20px; }
+  .charts .wide { grid-column: 1 / -1; }
+  .chart-card { padding: 18px; }
+  .chart-card h2 { font-size: 17px; font-weight: 700; }
+  .chart-card p { margin: 2px 0 12px; color: var(--text-faint); font-size: 12.5px; }
+  .chart-box { position: relative; height: 220px; }
+  .wide .chart-box { height: 260px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12.5px; color: var(--text-muted); margin-bottom: 8px; }
+  .legend span::before { content: ""; display: inline-block; width: 14px; height: 2px; vertical-align: middle; margin-right: 6px; background: var(--c); }
+  .legend span.dash::before { background: repeating-linear-gradient(90deg, var(--c) 0 4px, transparent 4px 7px); }
+
+  .log { padding: 18px; }
+  .log h2 { font-size: 17px; font-weight: 700; margin-bottom: 12px; }
+  .table-wrap { overflow-x: auto; }
+  .log-head { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+  .log-head h2 { margin: 0; }
+  .heat-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; color: var(--text-muted); }
+  .heat-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .heat-legend i { width: 14px; height: 14px; border-radius: 4px; background: var(--h); }
+  /* Heat map: 2px gaps between tinted cells, text stays in normal ink */
+  table { width: 100%; border-collapse: separate; border-spacing: 2px; font-variant-numeric: tabular-nums; font-size: 14px; }
+  th, td { padding: 7px 10px; text-align: right; white-space: nowrap; border-radius: 6px; }
+  th:first-child, td:first-child { text-align: left; }
+  thead th { color: var(--text-muted); font-weight: 600; font-size: 12px; }
+  thead tr.group th { color: var(--text-faint); font-weight: 500; text-align: center; text-transform: uppercase; letter-spacing: .1em; font-size: 11px; }
+  td { background: color-mix(in srgb, var(--text) 4%, var(--card)); }
+  td.good     { --h: var(--good); }
+  td.warning  { --h: var(--warning); }
+  td.serious  { --h: var(--serious); }
+  td.critical { --h: var(--critical); }
+  td.good, td.warning, td.serious, td.critical { background: color-mix(in srgb, var(--h) var(--heat, 30%), var(--card)); }
+  td.serious { --heat: 40%; } td.critical { --heat: 52%; }
+  td.na { color: var(--text-faint); }
+  td.date { background: transparent; color: var(--text-muted); }
+  tbody tr:hover td { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text) 35%, transparent); }
+  .heat-legend .good { --h: color-mix(in srgb, var(--good) 30%, var(--card)); }
+  .heat-legend .warning { --h: color-mix(in srgb, var(--warning) 30%, var(--card)); }
+  .heat-legend .serious { --h: color-mix(in srgb, var(--serious) 40%, var(--card)); }
+  .heat-legend .critical { --h: color-mix(in srgb, var(--critical) 52%, var(--card)); }
+</style>
+</head>
+<body>
+<header class="site-header"></header>
+
+<main class="container">
+  <section class="patient">
+    <div>
+      <div class="kicker">Health dashboard<span>·</span>Withings<span>·</span>Fitbit</div>
+      <h1 id="name"></h1>
+      <div class="facts" id="facts"></div>
+    </div>
+    <div class="meta">
+      <div class="seg" role="group" aria-label="Period">
+        <button data-n="7">7 days</button><button data-n="30" aria-pressed="true">30 days</button><button data-n="90">90 days</button>
+      </div>
+      <div id="updated"></div>
+    </div>
+  </section>
+
+  <section class="tiles" id="tiles"></section>
+
+  <section class="charts">
+    <div class="card chart-card wide">
+      <h2>Blood pressure</h2>
+      <p>Each point is the average of the two lowest readings in that session. Shaded band = normal (&lt;120 / &lt;80).</p>
+      <div class="legend">
+        <span style="--c:var(--s1)">AM systolic</span><span style="--c:var(--s2)">PM systolic</span>
+        <span class="dash" style="--c:var(--s1)">AM diastolic</span><span class="dash" style="--c:var(--s2)">PM diastolic</span>
+      </div>
+      <div class="chart-box"><canvas id="bp"></canvas></div>
+    </div>
+    <div class="card chart-card">
+      <h2>Weight</h2><p>kg · Withings Smart Body Analyzer</p>
+      <div class="chart-box"><canvas id="weight"></canvas></div>
+    </div>
+    <div class="card chart-card">
+      <h2>Heart rate</h2><p>bpm · band = daily lowest (sleep) to highest</p>
+      <div class="legend"><span style="--c:var(--s1)">Resting (Fitbit)</span><span style="--c:var(--axis)">Daily low–high</span></div>
+      <div class="chart-box"><canvas id="hr"></canvas></div>
+    </div>
+    <div class="card chart-card">
+      <h2>Heart rate variability</h2><p>ms RMSSD during sleep · higher is generally better</p>
+      <div class="chart-box"><canvas id="hrv"></canvas></div>
+    </div>
+    <div class="card chart-card">
+      <h2>Sleep</h2><p>hours asleep per night · dashed = 7 h</p>
+      <div class="chart-box"><canvas id="sleep"></canvas></div>
+    </div>
+  </section>
+
+  <section class="card log">
+    <div class="log-head">
+      <h2>Daily log</h2>
+      <div class="heat-legend" aria-label="Cell colours">
+        <span><i class="good"></i>In range</span><span><i class="warning"></i>Watch</span>
+        <span><i class="serious"></i>High / low</span><span><i class="critical"></i>Very high</span>
+        <span style="color:var(--text-faint)">Thresholds set in config.yaml · hover a cell for its label</span>
+      </div>
+    </div>
+    <div class="table-wrap"><table id="log"></table></div>
+  </section>
+</main>
+
+<footer class="site-footer"></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="mock-data.js"></script>
+<script src="site-chrome.js"></script>
+<script>
+const H = window.HEALTH, P = H.profile;
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const fmt = (v, dp = 0) => v == null ? "—" : v.toFixed(dp);
+let period = 30;
+
+document.getElementById("name").textContent = P.name;
+document.getElementById("facts").innerHTML = [
+  ["Age", H.age()], ["Sex", P.sex], ["Height", P.heightCm + " cm"], ["Goal weight", P.goals.weightKg + " kg"],
+].map(([k, v]) => `<span>${k} <b>${v}</b></span>`).join("");
+document.getElementById("updated").textContent = "Updated " + new Date(H.updated).toLocaleString("en-AU");
+
+let charts = [];
+function render(n) {
+  const cur = H.lastN(n), prev = H.days.slice(-2 * n, -n);
+  const avg = (arr, f) => H.mean(arr.map(f));
+  const amS = (d) => d.bpAm?.sys, amD = (d) => d.bpAm?.dia, pmS = (d) => d.bpPm?.sys, pmD = (d) => d.bpPm?.dia;
+
+  // lowerIsBetter decides whether a fall is coloured good or bad
+  function delta(f, dp, lowerIsBetter, unit = "") {
+    const a = avg(cur, f), b = avg(prev, f);
+    if (a == null || b == null || !prev.length) return "";
+    const d = a - b, cls = Math.abs(d) < 10 ** -dp ? "flat" : (d < 0) === lowerIsBetter ? "good" : "bad";
+    return `<span class="delta ${cls}">${d > 0 ? "▲" : d < 0 ? "▼" : "•"} ${Math.abs(d).toFixed(dp)}${unit}</span> vs prior ${n}d`;
+  }
+  const pill = (c) => c ? `<span class="pill ${c.key}"><i></i>${c.label}</span>` : "";
+
+  const amSys = avg(cur, amS), amDia = avg(cur, amD), pmSys = avg(cur, pmS), pmDia = avg(cur, pmD);
+  const latestW = [...cur].reverse().find((d) => d.weightKg);
+  const tiles = [
+    { label: "Weight", value: fmt(latestW?.weightKg, 1), unit: "kg", sub: delta((d) => d.weightKg, 1, true, " kg"), extra: `BMI ${fmt(latestW?.bmi, 1)}<br>` + pill(H.bmiCategory(latestW?.bmi)) },
+    { label: "BP · morning", value: `${fmt(amSys)}/${fmt(amDia)}`, unit: "mmHg", sub: delta(amS, 0, true), extra: pill(H.bpCategory(amSys, amDia)) },
+    { label: "BP · evening", value: `${fmt(pmSys)}/${fmt(pmDia)}`, unit: "mmHg", sub: delta(pmS, 0, true), extra: pill(H.bpCategory(pmSys, pmDia)) },
+    { label: "Resting HR", value: fmt(avg(cur, (d) => d.restingHr)), unit: "bpm", sub: delta((d) => d.restingHr, 0, true) },
+    { label: "HR low / high", value: `${Math.min(...cur.map((d) => d.minHr))}/${Math.max(...cur.map((d) => d.maxHr))}`, unit: "bpm", sub: `avg nightly low ${fmt(avg(cur, (d) => d.minHr))}` },
+    { label: "HRV", value: fmt(avg(cur, (d) => d.hrv)), unit: "ms", sub: delta((d) => d.hrv, 0, false, " ms") },
+    { label: "Sleep", value: fmt(avg(cur, (d) => d.sleepHrs), 1), unit: "h", sub: delta((d) => d.sleepHrs, 1, false, " h"), extra: `Score ${fmt(avg(cur, (d) => d.sleepScore))}` },
+  ];
+  document.getElementById("tiles").innerHTML = tiles.map((t) => `
+    <div class="card tile"><div class="label">${t.label}</div>
+      <div class="value">${t.value} <small>${t.unit}</small></div>
+      <div class="sub">${t.sub || "&nbsp;"}</div>${t.extra ? `<div class="sub">${t.extra}</div>` : ""}</div>`).join("");
+
+  charts.forEach((c) => c.destroy()); charts = [];
+  const labels = cur.map((d) => new Date(d.date).toLocaleDateString("en-AU", { day: "numeric", month: "short" }));
+  Chart.defaults.font.family = css("--font");
+  Chart.defaults.color = css("--text-faint");
+  const base = (y = {}) => ({
+    responsive: true, maintainAspectRatio: false, animation: false,
+    interaction: { mode: "index", intersect: false },
+    plugins: { legend: { display: false }, tooltip: { backgroundColor: css("--bg-elev"), borderColor: css("--border"), borderWidth: 1, titleColor: css("--text"), bodyColor: css("--text-muted"), padding: 10, cornerRadius: 10 } },
+    scales: {
+      x: { grid: { display: false }, border: { color: css("--axis") }, ticks: { maxTicksLimit: 8 } },
+      y: { grid: { color: css("--grid") }, border: { display: false }, ...y },
+    },
+  });
+  const line = (label, data, color, o = {}) => ({ label, data, borderColor: color, backgroundColor: color, borderWidth: 2, pointRadius: n <= 7 ? 4 : 0, pointHoverRadius: 5, tension: 0.3, spanGaps: true, ...o });
+
+  // shaded normal band for BP
+  const bandPlugin = (lo, hi) => ({ id: "band", beforeDatasetsDraw(c) {
+    const { ctx, chartArea: a, scales: { y } } = c; ctx.save(); ctx.fillStyle = css("--band");
+    const top = y.getPixelForValue(hi), bot = y.getPixelForValue(lo); ctx.fillRect(a.left, top, a.width, bot - top); ctx.restore(); } });
+
+  charts.push(new Chart(bp, { type: "line", data: { labels, datasets: [
+    line("AM systolic", cur.map(amS), css("--s1")), line("PM systolic", cur.map(pmS), css("--s2")),
+    line("AM diastolic", cur.map(amD), css("--s1"), { borderDash: [4, 3] }), line("PM diastolic", cur.map(pmD), css("--s2"), { borderDash: [4, 3] }),
+  ] }, options: base({ suggestedMin: 60, suggestedMax: 150 }), plugins: [bandPlugin(60, 120)] }));
+
+  charts.push(new Chart(weight, { type: "line", data: { labels, datasets: [line("Weight kg", cur.map((d) => d.weightKg), css("--s1"))] }, options: base() }));
+
+  charts.push(new Chart(hr, { type: "line", data: { labels, datasets: [
+    line("Highest", cur.map((d) => d.maxHr), css("--axis"), { borderWidth: 1, pointRadius: 0, fill: "+1", backgroundColor: css("--grid") }),
+    line("Lowest", cur.map((d) => d.minHr), css("--axis"), { borderWidth: 1, pointRadius: 0 }),
+    line("Resting", cur.map((d) => d.restingHr), css("--s1")),
+  ] }, options: base({ suggestedMin: 40 }) }));
+
+  charts.push(new Chart(hrv, { type: "line", data: { labels, datasets: [line("HRV ms", cur.map((d) => d.hrv), css("--s7"))] }, options: base() }));
+
+  const sevenH = { id: "ref", afterDatasetsDraw(c) { const { ctx, chartArea: a, scales: { y } } = c, py = y.getPixelForValue(7);
+    ctx.save(); ctx.strokeStyle = css("--text-muted"); ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(a.left, py); ctx.lineTo(a.right, py); ctx.stroke(); ctx.restore(); } };
+  charts.push(new Chart(sleep, { type: "bar", data: { labels, datasets: [{ label: "Hours", data: cur.map((d) => d.sleepHrs), backgroundColor: css("--s3"), borderRadius: 4, borderSkipped: "bottom", maxBarThickness: 18 }] },
+    options: base({ suggestedMin: 0, suggestedMax: 9 }), plugins: [sevenH] }));
+
+  // table, most recent first
+  const cell = (text, c) => c ? `<td class="${c.key}" title="${c.label}">${text}</td>` : `<td class="na">—</td>`;
+  const heat = (metric, v, dp = 0) => cell(fmt(v, dp), H.classify(metric, v));
+  const bpCell = (s) => s ? cell(`${s.sys}/${s.dia}`, H.bpCategory(s.sys, s.dia)) : cell();
+  const rows = [...cur].reverse().map((d) => `<tr><td class="date">${new Date(d.date).toLocaleDateString("en-AU", { weekday: "short", day: "numeric", month: "short" })}</td>
+    ${heat("weight_kg", d.weightKg, 1)}${heat("bmi", d.bmi, 1)}${bpCell(d.bpAm)}${bpCell(d.bpPm)}
+    ${heat("resting_hr", d.restingHr)}${heat("min_hr", d.minHr)}${heat("max_hr", d.maxHr)}${heat("hrv", d.hrv)}
+    ${heat("sleep_hours", d.sleepHrs, 1)}${heat("sleep_score", d.sleepScore)}</tr>`).join("");
+  document.getElementById("log").innerHTML = `<thead>
+    <tr class="group"><th></th><th colspan="2">Body</th><th colspan="2">BP mmHg</th><th colspan="4">Heart</th><th colspan="2">Sleep</th></tr>
+    <tr><th>Date</th><th>Weight</th><th>BMI</th><th>AM</th><th>PM</th><th>Resting</th><th>Low</th><th>High</th><th>HRV</th><th>Hours</th><th>Score</th></tr></thead><tbody>${rows}</tbody>`;
+}
+
+document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => {
+  document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", x === b));
+  render(period = +b.dataset.n);
+}));
+matchMedia("(prefers-color-scheme: light)").addEventListener("change", () => render(period));
+document.addEventListener("themechange", () => render(period));
+render(period);
+</script>
+</body>
+</html>
