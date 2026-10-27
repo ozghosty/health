@@ -18,7 +18,7 @@
   .facts b { color: var(--text); font-weight: 600; }
   .meta { color: var(--text-faint); font-size: 12.5px; text-align: right; display: grid; gap: 8px; justify-items: end; }
 
-  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; margin-bottom: 20px; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 12px; margin-bottom: 20px; }
   .tile { padding: 16px; transition: border-color .2s; }
   .tile:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); }
   .tile .label { color: var(--text-faint); font-size: 11.5px; text-transform: uppercase; letter-spacing: .1em; font-weight: 600; }
@@ -41,7 +41,10 @@
 
   .log { padding: 18px; }
   .log h2 { font-size: 17px; font-weight: 700; margin-bottom: 12px; }
-  .table-wrap { overflow-x: auto; }
+  .table-wrap { overflow: auto; max-height: 75vh; }
+  thead { position: sticky; top: 0; z-index: 1; background: var(--card); }
+  td small.pulse { margin-left: 6px; font-size: 11.5px; color: var(--text-muted); }
+  @media (max-width: 640px) { .seg button { padding: 6px 9px; } }
   .log-head { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
   .log-head h2 { margin: 0; }
   .heat-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; color: var(--text-muted); }
@@ -81,9 +84,10 @@
     </div>
     <div class="meta">
       <div class="seg" role="group" aria-label="Period">
-        <button data-n="7">7 days</button><button data-n="30" aria-pressed="true">30 days</button><button data-n="90">90 days</button>
+        <button data-n="7">7 days</button><button data-n="30" aria-pressed="true">30 days</button><button data-n="90">90 days</button><button data-n="365">1 year</button><button data-n="0">All</button>
       </div>
       <div id="updated"></div>
+      <div id="agg-note"></div>
     </div>
   </section>
 

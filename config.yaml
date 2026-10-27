@@ -58,6 +58,14 @@ blood_pressure:
   keep: 2                     # N for `lowest`
   rank_by: systolic           # which value decides "lowest": systolic | mean_arterial
   min_readings: 2             # skip sessions with fewer readings than this
+  # Readings with a cuff pulse above this are treated as "not settled yet" (white-coat
+  # effect) and left out before picking the lowest. If fewer than min_readings are left,
+  # the whole session is used and flagged † on the page. Delete the line to turn it off.
+  max_pulse: 80
+  # The "Home BP" tile averages every session in the last home_days days and compares
+  # it with the home-monitoring threshold, which is lower than the clinic one (140/90).
+  home_days: 7
+  home_threshold: [135, 85]
 
 heart_rate:
   # Fitbit intraday HR is 1-minute resolution. The nightly low/high use a rolling

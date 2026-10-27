@@ -68,12 +68,12 @@
   }
 
   const canvases = Object.fromEntries(["bp", "weight", "hr", "hrv", "sleep"].map((id) => [id, document.getElementById(id)]));
-  let period = H.dashboard?.default_period_days || 30;
+  let period = H.dashboard?.default_period_days ?? 30;  // 0 = all history
   document.querySelectorAll(".seg button").forEach((b) => b.setAttribute("aria-pressed", +b.dataset.n === period));
 
   let charts = [];
   function render(n) {
-    const cur = lastN(n), prev = days.slice(-2 * n, -n);
+    const cur = n ? lastN(n) : days, prev = n ? days.slice(-2 * n, -n) : [];
     const avg = (arr, f) => mean(arr.map(f));
     const amS = (d) => d.bpAm?.sys, amD = (d) => d.bpAm?.dia, pmS = (d) => d.bpPm?.sys, pmD = (d) => d.bpPm?.dia;
 
@@ -90,10 +90,18 @@
     const amSys = avg(cur, amS), amDia = avg(cur, amD), pmSys = avg(cur, pmS), pmDia = avg(cur, pmD);
     // Pulse pressure = systolic − diastolic; MAP (mean arterial pressure) ≈ diastolic + PP / 3
     const ppMap = (sys, dia) => sys == null || dia == null ? "" : `Pulse pressure ${fmt(sys - dia)} · MAP ${fmt(dia + (sys - dia) / 3)}<br>`;
+    // Home BP: every session in the last home_days days (whatever the period), against the home threshold
+    const homeDays = bp.home_days ?? 7, [homeSys, homeDia] = bp.home_threshold ?? [135, 85];
+    const homeSessions = days.slice(-homeDays).flatMap((d) => [d.bpAm, d.bpPm]).filter(Boolean);
+    const hS = mean(homeSessions.map((s) => s.sys)), hD = mean(homeSessions.map((s) => s.dia));
+    const homePill = hS == null ? null : hS >= homeSys || hD >= homeDia
+      ? { key: "serious", label: `At/above ${homeSys}/${homeDia}` } : { key: "good", label: `Below ${homeSys}/${homeDia}` };
     const latestW = [...cur].reverse().find((d) => d.weightKg);
     const lows = vals((d) => d.minHr), highs = vals((d) => d.maxHr);
     const tiles = [
       { label: "Weight", value: fmt(latestW?.weightKg, 1), unit: "kg", sub: delta((d) => d.weightKg, 1, true, " kg"), extra: `BMI ${fmt(latestW?.bmi, 1)}<br>` + pill(classify("bmi", latestW?.bmi)) },
+      { label: `Home BP · ${homeDays} days`, value: `${fmt(hS)}/${fmt(hD)}`, unit: "mmHg",
+        sub: `${homeSessions.length} session${homeSessions.length === 1 ? "" : "s"}${homeSessions.length < 6 ? " · 6+ needed for a reliable average" : ""}`, extra: pill(homePill) },
       { label: "BP · morning", value: `${fmt(amSys)}/${fmt(amDia)}`, unit: "mmHg", sub: delta(amS, 0, true), extra: ppMap(amSys, amDia) + pill(bpCategory(amSys, amDia)) },
       { label: "BP · evening", value: `${fmt(pmSys)}/${fmt(pmDia)}`, unit: "mmHg", sub: delta(pmS, 0, true), extra: ppMap(pmSys, pmDia) + pill(bpCategory(pmSys, pmDia)) },
       { label: "Resting HR", value: fmt(avg(cur, (d) => d.restingHr)), unit: "bpm", sub: delta((d) => d.restingHr, 0, true) },
@@ -107,7 +115,19 @@
         <div class="sub">${t.sub || "&nbsp;"}</div>${t.extra ? `<div class="sub">${t.extra}</div>` : ""}</div>`).join("");
 
     charts.forEach((c) => c.destroy()); charts = [];
-    const labels = cur.map((d) => day(d.date, { day: "numeric", month: "short" }));
+    // Long periods plot one point per week (Mon–Sun average) instead of one per day
+    const weekly = cur.length > 120;
+    const monday = (s) => { const d = new Date(s + "T00:00:00"); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d; };
+    const buckets = [];
+    for (const d of cur) {
+      const key = weekly ? monday(d.date).toDateString() : d.date;
+      if (buckets.at(-1)?.key === key) buckets.at(-1).days.push(d); else buckets.push({ key, days: [d] });
+    }
+    const series = (f) => buckets.map((b) => { const v = mean(b.days.map(f)); return v == null ? null : Math.round(v * 10) / 10; });
+    const labels = buckets.map((b) => weekly
+      ? monday(b.days[0].date).toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "2-digit" })
+      : day(b.days[0].date, { day: "numeric", month: "short" }));
+    document.getElementById("agg-note").textContent = weekly ? "Charts show weekly averages (Mon–Sun)" : "";
     Chart.defaults.font.family = css("--font");
     Chart.defaults.color = css("--text-faint");
     const base = (y = {}) => ({
@@ -121,7 +141,7 @@
     });
     // Dots on short periods, and on sparse series where a lone reading would draw no line
     const line = (label, data, color, o = {}) => ({ label, data, borderColor: color, backgroundColor: color, borderWidth: 2,
-      pointRadius: n <= 7 || data.filter((v) => v != null).length < 10 ? 4 : 0, pointHoverRadius: 5, tension: 0.3, spanGaps: true, ...o });
+      pointRadius: buckets.length <= 7 || data.filter((v) => v != null).length < 10 ? 4 : 0, pointHoverRadius: 5, tension: 0.3, spanGaps: true, ...o });
 
     // shaded normal band for BP
     const bandPlugin = (lo, hi) => ({ id: "band", beforeDatasetsDraw(c) {
@@ -129,23 +149,23 @@
       const top = y.getPixelForValue(hi), bot = y.getPixelForValue(lo); ctx.fillRect(a.left, top, a.width, bot - top); ctx.restore(); } });
 
     charts.push(new Chart(canvases.bp, { type: "line", data: { labels, datasets: [
-      line("AM systolic", cur.map(amS), css("--s1")), line("PM systolic", cur.map(pmS), css("--s2")),
-      line("AM diastolic", cur.map(amD), css("--s1"), { borderDash: [4, 3] }), line("PM diastolic", cur.map(pmD), css("--s2"), { borderDash: [4, 3] }),
+      line("AM systolic", series(amS), css("--s1")), line("PM systolic", series(pmS), css("--s2")),
+      line("AM diastolic", series(amD), css("--s1"), { borderDash: [4, 3] }), line("PM diastolic", series(pmD), css("--s2"), { borderDash: [4, 3] }),
     ] }, options: base({ suggestedMin: 60, suggestedMax: 150 }), plugins: [bandPlugin(60, G.bp_systolic ?? 120)] }));
 
-    charts.push(new Chart(canvases.weight, { type: "line", data: { labels, datasets: [line("Weight kg", cur.map((d) => d.weightKg), css("--s1"))] }, options: base() }));
+    charts.push(new Chart(canvases.weight, { type: "line", data: { labels, datasets: [line("Weight kg", series((d) => d.weightKg), css("--s1"))] }, options: base() }));
 
     charts.push(new Chart(canvases.hr, { type: "line", data: { labels, datasets: [
-      line("Highest", cur.map((d) => d.maxHr), css("--axis"), { borderWidth: 1, pointRadius: 0, fill: "+1", backgroundColor: css("--grid"), order: 2 }),
-      line("Lowest", cur.map((d) => d.minHr), css("--axis"), { borderWidth: 1, pointRadius: 0, order: 2 }),
-      line("Resting", cur.map((d) => d.restingHr), css("--s1"), { order: 1 }), // lower order draws on top of the band
+      line("Highest", series((d) => d.maxHr), css("--axis"), { borderWidth: 1, pointRadius: 0, fill: "+1", backgroundColor: css("--grid"), order: 2 }),
+      line("Lowest", series((d) => d.minHr), css("--axis"), { borderWidth: 1, pointRadius: 0, order: 2 }),
+      line("Resting", series((d) => d.restingHr), css("--s1"), { order: 1 }), // lower order draws on top of the band
     ] }, options: base({ suggestedMin: 40 }) }));
 
-    charts.push(new Chart(canvases.hrv, { type: "line", data: { labels, datasets: [line("HRV ms", cur.map((d) => d.hrv), css("--s7"))] }, options: base() }));
+    charts.push(new Chart(canvases.hrv, { type: "line", data: { labels, datasets: [line("HRV ms", series((d) => d.hrv), css("--s7"))] }, options: base() }));
 
     const goalLine = { id: "ref", afterDatasetsDraw(c) { const { ctx, chartArea: a, scales: { y } } = c, py = y.getPixelForValue(sleepGoal);
       ctx.save(); ctx.strokeStyle = css("--text-muted"); ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(a.left, py); ctx.lineTo(a.right, py); ctx.stroke(); ctx.restore(); } };
-    charts.push(new Chart(canvases.sleep, { type: "bar", data: { labels, datasets: [{ label: "Hours", data: cur.map((d) => d.sleepHrs), backgroundColor: css("--s3"), borderRadius: 4, borderSkipped: "bottom", maxBarThickness: 18 }] },
+    charts.push(new Chart(canvases.sleep, { type: "bar", data: { labels, datasets: [{ label: "Hours", data: series((d) => d.sleepHrs), backgroundColor: css("--s3"), borderRadius: 4, borderSkipped: "bottom", maxBarThickness: 18 }] },
       options: base({ suggestedMin: 0, suggestedMax: 9 }), plugins: [goalLine] }));
 
     // table, most recent first
@@ -154,7 +174,9 @@
     const bpCell = (s) => {
       if (!s) return cell();
       const c = bpCategory(s.sys, s.dia);
-      return cell(`${s.sys}/${s.dia}`, c && { ...c, label: `${c.label} · pulse pressure ${s.sys - s.dia} · MAP ${Math.round(s.dia + (s.sys - s.dia) / 3)}${s.pulse ? ` · pulse ${s.pulse}` : ""}` });
+      const note = s.unsettled ? ` · † pulse stayed above ${bp.max_pulse}, so every reading was used` : "";
+      const text = `${s.sys}/${s.dia}${s.unsettled ? "†" : ""}${s.pulse ? `<small class="pulse">♥${s.pulse}</small>` : ""}`;
+      return cell(text, c && { ...c, label: `${c.label} · pulse pressure ${s.sys - s.dia} · MAP ${Math.round(s.dia + (s.sys - s.dia) / 3)}${s.pulse ? ` · pulse ${s.pulse}` : ""}${note}` });
     };
     const rows = [...cur].reverse().map((d) => `<tr><td class="date">${day(d.date, { weekday: "short", day: "numeric", month: "short" })}</td>
       ${heat("weight_kg", d.weightKg, 1)}${heat("bmi", d.bmi, 1)}${bpCell(d.bpAm)}${bpCell(d.bpPm)}

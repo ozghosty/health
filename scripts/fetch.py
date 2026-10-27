@@ -167,16 +167,25 @@ def bp_sessions(readings, rules):
 
     rank = (lambda r: r["sys"]) if rules.get("rank_by", "systolic") == "systolic" \
         else (lambda r: (r["sys"] + 2 * r["dia"]) / 3)  # mean arterial pressure
+    max_pulse = rules.get("max_pulse")
+    high = lambda r: bool(max_pulse) and r["pulse"] is not None and r["pulse"] > max_pulse
     for (date, slot), kept in sorted(best.items()):
+        # leave out readings taken before the pulse settled, unless too few would remain
+        pool = [r for r in kept if not high(r)]
+        unsettled = len(pool) < rules.get("min_readings", 1)
+        if unsettled:
+            pool = kept
         if rules.get("method", "lowest") == "lowest":
-            used = sorted(kept, key=rank)[: rules.get("keep", 2)]
+            used = sorted(pool, key=rank)[: rules.get("keep", 2)]
         else:
-            used = kept
+            used = pool
         avg = lambda f: int(sum(r[f] for r in used) / len(used) + 0.5) if all(r[f] is not None for r in used) else None
         yield date, slot, {
             "sys": avg("sys"), "dia": avg("dia"), "pulse": avg("pulse"),
-            "readings": [{"sys": r["sys"], "dia": r["dia"], "pulse": r["pulse"], **({"used": True} if any(r is u for u in used) else {})}
-                         for r in kept],
+            "readings": [{"sys": r["sys"], "dia": r["dia"], "pulse": r["pulse"],
+                          **({"used": True} if any(r is u for u in used) else {}),
+                          **({"highPulse": True} if high(r) else {})} for r in kept],
+            **({"unsettled": True} if unsettled else {}),
         }
 
 
