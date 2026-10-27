@@ -88,12 +88,14 @@
     const vals = (f) => cur.map(f).filter((v) => v != null);
 
     const amSys = avg(cur, amS), amDia = avg(cur, amD), pmSys = avg(cur, pmS), pmDia = avg(cur, pmD);
+    // Pulse pressure = systolic − diastolic; MAP (mean arterial pressure) ≈ diastolic + PP / 3
+    const ppMap = (sys, dia) => sys == null || dia == null ? "" : `Pulse pressure ${fmt(sys - dia)} · MAP ${fmt(dia + (sys - dia) / 3)}<br>`;
     const latestW = [...cur].reverse().find((d) => d.weightKg);
     const lows = vals((d) => d.minHr), highs = vals((d) => d.maxHr);
     const tiles = [
       { label: "Weight", value: fmt(latestW?.weightKg, 1), unit: "kg", sub: delta((d) => d.weightKg, 1, true, " kg"), extra: `BMI ${fmt(latestW?.bmi, 1)}<br>` + pill(classify("bmi", latestW?.bmi)) },
-      { label: "BP · morning", value: `${fmt(amSys)}/${fmt(amDia)}`, unit: "mmHg", sub: delta(amS, 0, true), extra: pill(bpCategory(amSys, amDia)) },
-      { label: "BP · evening", value: `${fmt(pmSys)}/${fmt(pmDia)}`, unit: "mmHg", sub: delta(pmS, 0, true), extra: pill(bpCategory(pmSys, pmDia)) },
+      { label: "BP · morning", value: `${fmt(amSys)}/${fmt(amDia)}`, unit: "mmHg", sub: delta(amS, 0, true), extra: ppMap(amSys, amDia) + pill(bpCategory(amSys, amDia)) },
+      { label: "BP · evening", value: `${fmt(pmSys)}/${fmt(pmDia)}`, unit: "mmHg", sub: delta(pmS, 0, true), extra: ppMap(pmSys, pmDia) + pill(bpCategory(pmSys, pmDia)) },
       { label: "Resting HR", value: fmt(avg(cur, (d) => d.restingHr)), unit: "bpm", sub: delta((d) => d.restingHr, 0, true) },
       { label: "HR low / high", value: `${lows.length ? Math.min(...lows) : "—"}/${highs.length ? Math.max(...highs) : "—"}`, unit: "bpm", sub: `avg nightly low ${fmt(avg(cur, (d) => d.minHr))}` },
       { label: "HRV", value: fmt(avg(cur, (d) => d.hrv)), unit: "ms", sub: delta((d) => d.hrv, 0, false, " ms") },
@@ -149,7 +151,11 @@
     // table, most recent first
     const cell = (text, c) => c ? `<td class="${c.key}" title="${esc(c.label)}">${text}</td>` : `<td class="na">${text && text !== "—" ? text : "—"}</td>`;
     const heat = (metric, v, dp = 0) => cell(fmt(v, dp), classify(metric, v));
-    const bpCell = (s) => s ? cell(`${s.sys}/${s.dia}`, bpCategory(s.sys, s.dia)) : cell();
+    const bpCell = (s) => {
+      if (!s) return cell();
+      const c = bpCategory(s.sys, s.dia);
+      return cell(`${s.sys}/${s.dia}`, c && { ...c, label: `${c.label} · pulse pressure ${s.sys - s.dia} · MAP ${Math.round(s.dia + (s.sys - s.dia) / 3)}${s.pulse ? ` · pulse ${s.pulse}` : ""}` });
+    };
     const rows = [...cur].reverse().map((d) => `<tr><td class="date">${day(d.date, { weekday: "short", day: "numeric", month: "short" })}</td>
       ${heat("weight_kg", d.weightKg, 1)}${heat("bmi", d.bmi, 1)}${bpCell(d.bpAm)}${bpCell(d.bpPm)}
       ${heat("resting_hr", d.restingHr)}${heat("min_hr", d.minHr)}${heat("max_hr", d.maxHr)}${heat("hrv", d.hrv)}
