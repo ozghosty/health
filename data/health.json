@@ -1,6 +1,6 @@
 {
   "repo": "ozghosty/health",
-  "updated": "2026-10-29T23:47:44Z",
+  "updated": "2026-10-30T23:27:51Z",
   "days": [
     {"date":"2025-10-30","restingHr":66,"hrv":88,"spo2":96.8,"breathingRate":16.8,"steps":9828},
     {"date":"2025-10-31","restingHr":63,"steps":10355,"sleepHrs":7.2,"deepMin":88,"remMin":77,"lightMin":268,"awakeMin":16},
@@ -336,6 +336,7 @@
     {"date":"2026-10-27","bpAm":{"sys":129,"dia":78,"pulse":81,"readings":[{"sys":126,"dia":77,"pulse":91,"used":true,"highPulse":true},{"sys":132,"dia":78,"pulse":71,"used":true}],"unsettled":true},"restingHr":67,"hrv":38,"breathingRate":16.6,"steps":10278,"sleepHrs":7.2,"deepMin":70,"remMin":88,"lightMin":273,"awakeMin":76,"maxHr":140,"minHr":55,"weightKg":74.4,"bmi":21.7,"bpPm":{"sys":152,"dia":85,"pulse":75,"readings":[{"sys":155,"dia":85,"pulse":75,"used":true},{"sys":148,"dia":85,"pulse":74,"used":true}]},"spo2":96.6},
     {"date":"2026-10-28","bpAm":{"sys":135,"dia":77,"pulse":74,"readings":[{"sys":137,"dia":77,"pulse":80,"used":true},{"sys":132,"dia":76,"pulse":68,"used":true}]},"restingHr":68,"hrv":40,"breathingRate":16.4,"steps":12929,"sleepHrs":7.2,"deepMin":80,"remMin":71,"lightMin":284,"awakeMin":54,"maxHr":126,"minHr":56,"weightKg":74.1,"bmi":21.7,"bpPm":{"sys":144,"dia":76,"pulse":76,"readings":[{"sys":144,"dia":75,"pulse":76,"used":true},{"sys":144,"dia":77,"pulse":75,"used":true}]},"spo2":96.6},
     {"date":"2026-10-29","bpAm":{"sys":123,"dia":75,"pulse":71,"readings":[{"sys":142,"dia":71,"pulse":71},{"sys":117,"dia":72,"pulse":70,"used":true},{"sys":129,"dia":77,"pulse":71,"used":true}]},"steps":16681,"maxHr":135,"weightKg":74.0,"bmi":21.6,"restingHr":68,"hrv":42,"spo2":96.4,"breathingRate":16.4,"sleepHrs":7.0,"deepMin":94,"remMin":70,"lightMin":257,"awakeMin":9,"minHr":54},
-    {"date":"2026-10-30","restingHr":67,"hrv":51,"breathingRate":15.2,"steps":1708,"sleepHrs":8.1,"deepMin":73,"remMin":52,"lightMin":362,"awakeMin":18,"maxHr":94,"minHr":53}
+    {"date":"2026-10-30","restingHr":67,"hrv":51,"breathingRate":15.2,"steps":10169,"sleepHrs":8.1,"deepMin":73,"remMin":52,"lightMin":362,"awakeMin":18,"maxHr":101,"minHr":53,"weightKg":74.0,"bmi":21.6},
+    {"date":"2026-10-31","weightKg":72.7,"bmi":21.2}
   ]
 }
