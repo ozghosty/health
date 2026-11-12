@@ -1,6 +1,6 @@
 {
   "repo": "ozghosty/health",
-  "updated": "2026-11-11T00:25:19Z",
+  "updated": "2026-11-12T01:48:22Z",
   "days": [
     {"date":"2025-10-30","restingHr":66,"hrv":88,"spo2":96.8,"breathingRate":16.8,"steps":9828},
     {"date":"2025-10-31","restingHr":63,"steps":10355,"sleepHrs":7.2,"deepMin":88,"remMin":77,"lightMin":268,"awakeMin":16},
@@ -344,9 +344,11 @@
     {"date":"2026-11-04","maxHr":122,"restingHr":67,"hrv":45,"spo2":96.6,"breathingRate":17,"steps":14334,"sleepHrs":6.2,"deepMin":87,"remMin":69,"lightMin":214,"awakeMin":4,"minHr":54},
     {"date":"2026-11-05","restingHr":66,"hrv":56,"breathingRate":18.4,"steps":13050,"sleepHrs":6.2,"deepMin":72,"remMin":43,"lightMin":258,"awakeMin":50,"maxHr":123,"minHr":46,"spo2":96.2},
     {"date":"2026-11-06","restingHr":65,"hrv":59,"breathingRate":16.8,"steps":16396,"sleepHrs":6.2,"deepMin":97,"remMin":72,"lightMin":204,"awakeMin":27,"maxHr":151,"minHr":52,"spo2":98.9},
-    {"date":"2026-11-07","restingHr":65,"hrv":63,"spo2":97,"breathingRate":16.8,"steps":8827,"sleepHrs":8.0,"deepMin":90,"remMin":87,"lightMin":300,"awakeMin":18,"maxHr":100,"minHr":53},
+    {"date":"2026-11-07","restingHr":65,"hrv":63,"spo2":97,"breathingRate":16.8,"steps":9285,"sleepHrs":8.0,"deepMin":90,"remMin":87,"lightMin":300,"awakeMin":18,"maxHr":100,"minHr":53},
     {"date":"2026-11-08","restingHr":67,"hrv":48,"breathingRate":16.6,"steps":13106,"sleepHrs":7.7,"deepMin":74,"remMin":111,"lightMin":279,"awakeMin":42,"maxHr":122,"minHr":56,"spo2":98.8},
     {"date":"2026-11-09","maxHr":112,"restingHr":67,"hrv":54,"spo2":96.8,"breathingRate":16.6,"steps":12496,"sleepHrs":6.9,"deepMin":84,"remMin":69,"lightMin":260,"awakeMin":16,"minHr":51},
-    {"date":"2026-11-10","restingHr":69,"hrv":36,"breathingRate":16,"steps":3670,"sleepHrs":7.9,"deepMin":88,"remMin":87,"lightMin":299,"awakeMin":28,"maxHr":102,"minHr":59}
+    {"date":"2026-11-10","restingHr":69,"hrv":36,"breathingRate":16,"steps":9141,"sleepHrs":7.9,"deepMin":88,"remMin":87,"lightMin":299,"awakeMin":28,"maxHr":134,"minHr":59,"spo2":96.8},
+    {"date":"2026-11-11","restingHr":69,"hrv":40,"breathingRate":16.4,"steps":12327,"sleepHrs":5.7,"deepMin":75,"remMin":54,"lightMin":210,"awakeMin":16,"maxHr":130,"minHr":55},
+    {"date":"2026-11-12","steps":16,"maxHr":70}
   ]
 }
