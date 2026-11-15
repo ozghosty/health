@@ -1,6 +1,6 @@
 {
   "repo": "ozghosty/health",
-  "updated": "2026-11-14T23:37:42Z",
+  "updated": "2026-11-15T23:45:07Z",
   "days": [
     {"date":"2025-10-30","restingHr":66,"hrv":88,"spo2":96.8,"breathingRate":16.8,"steps":9828},
     {"date":"2025-10-31","restingHr":63,"steps":10355,"sleepHrs":7.2,"deepMin":88,"remMin":77,"lightMin":268,"awakeMin":16},
@@ -350,7 +350,8 @@
     {"date":"2026-11-10","restingHr":69,"hrv":36,"breathingRate":16,"steps":9141,"sleepHrs":7.9,"deepMin":88,"remMin":87,"lightMin":299,"awakeMin":28,"maxHr":134,"minHr":59,"spo2":96.8},
     {"date":"2026-11-11","restingHr":69,"hrv":40,"breathingRate":16.4,"steps":12327,"sleepHrs":5.7,"deepMin":75,"remMin":54,"lightMin":210,"awakeMin":16,"maxHr":130,"minHr":55,"spo2":99},
     {"date":"2026-11-12","steps":15244,"maxHr":122,"restingHr":68,"hrv":48,"spo2":98.9,"breathingRate":17,"sleepHrs":8.1,"deepMin":79,"remMin":112,"lightMin":295,"awakeMin":9,"minHr":55},
-    {"date":"2026-11-13","restingHr":67,"hrv":58,"breathingRate":17.6,"steps":16187,"sleepHrs":7.2,"deepMin":71,"remMin":74,"lightMin":288,"awakeMin":11,"maxHr":125,"minHr":53},
-    {"date":"2026-11-14","maxHr":70}
+    {"date":"2026-11-13","restingHr":67,"hrv":58,"breathingRate":17.6,"steps":16187,"sleepHrs":7.2,"deepMin":71,"remMin":74,"lightMin":288,"awakeMin":11,"maxHr":125,"minHr":53,"spo2":95.6},
+    {"date":"2026-11-14","maxHr":136,"restingHr":68,"hrv":41,"spo2":97,"breathingRate":17.2,"steps":22203,"sleepHrs":6.1,"deepMin":78,"remMin":81,"lightMin":205,"awakeMin":14,"minHr":57},
+    {"date":"2026-11-15","restingHr":65,"hrv":53,"breathingRate":16.6,"steps":3484,"sleepHrs":8.2,"deepMin":79,"remMin":108,"lightMin":304,"awakeMin":18,"maxHr":133,"minHr":52}
   ]
 }
