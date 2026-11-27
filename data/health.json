@@ -1,6 +1,6 @@
 {
   "repo": "ozghosty/health",
-  "updated": "2026-11-26T02:38:20Z",
+  "updated": "2026-11-27T02:39:20Z",
   "days": [
     {"date":"2025-10-30","restingHr":66,"hrv":88,"spo2":96.8,"breathingRate":16.8,"steps":9828},
     {"date":"2025-10-31","restingHr":63,"steps":10355,"sleepHrs":7.2,"deepMin":88,"remMin":77,"lightMin":268,"awakeMin":16},
@@ -361,8 +361,9 @@
     {"date":"2026-11-21","restingHr":65,"hrv":51,"breathingRate":17,"steps":18518,"sleepHrs":6.1,"deepMin":65,"remMin":66,"lightMin":237,"awakeMin":27,"maxHr":137,"minHr":53,"spo2":96.3},
     {"date":"2026-11-22","restingHr":67,"hrv":38,"spo2":95.3,"breathingRate":17.4,"steps":12635,"sleepHrs":6.2,"deepMin":56,"remMin":90,"lightMin":226,"awakeMin":12,"maxHr":125,"minHr":57},
     {"date":"2026-11-23","restingHr":65,"hrv":51,"breathingRate":16.8,"steps":20219,"sleepHrs":7.4,"deepMin":87,"remMin":89,"lightMin":267,"awakeMin":7,"maxHr":133,"minHr":50,"spo2":95.2},
-    {"date":"2026-11-24","restingHr":67,"hrv":37,"breathingRate":17.2,"steps":1717,"sleepHrs":4.8,"deepMin":77,"remMin":57,"lightMin":157,"awakeMin":36,"maxHr":102,"minHr":58,"spo2":97},
+    {"date":"2026-11-24","restingHr":67,"hrv":37,"breathingRate":17.2,"steps":13250,"sleepHrs":4.8,"deepMin":77,"remMin":57,"lightMin":157,"awakeMin":36,"maxHr":102,"minHr":58,"spo2":97},
     {"date":"2026-11-25","restingHr":65,"hrv":48,"breathingRate":16.2,"steps":14461,"sleepHrs":7.2,"deepMin":93,"remMin":71,"lightMin":269,"awakeMin":13,"maxHr":113,"minHr":49,"spo2":97.1},
-    {"date":"2026-11-26","restingHr":66,"hrv":48,"breathingRate":16.6,"steps":4089,"sleepHrs":5.9,"deepMin":92,"remMin":43,"lightMin":219,"awakeMin":8,"maxHr":136,"minHr":54}
+    {"date":"2026-11-26","restingHr":65,"hrv":48,"breathingRate":16.6,"steps":13021,"sleepHrs":5.9,"deepMin":92,"remMin":43,"lightMin":219,"awakeMin":8,"maxHr":136,"minHr":54,"spo2":96.9},
+    {"date":"2026-11-27","restingHr":66,"hrv":43,"breathingRate":16.6,"steps":6387,"sleepHrs":8.1,"deepMin":99,"remMin":84,"lightMin":305,"awakeMin":14,"maxHr":109,"minHr":54}
   ]
 }
